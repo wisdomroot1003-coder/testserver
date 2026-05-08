@@ -2,14 +2,26 @@
 <html lang="ko"> 
 <head> 
     <meta charset="UTF-8"> 
-    <title>6학년 5반 키우기 (Cloud Sync)</title> 
+    <title>학급 키우기 (Cloud Sync)</title> 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script> 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script> 
     
     <style> 
-        /* CSS 스타일링 (기존과 동일) */ 
+        /* CSS 스타일링 */ 
         :root { --main-blue: #4a90e2; --admin-red: #e74c3c; --gold: #f1c40f; --green: #2ecc71; --purple: #9b59b6; --dark: #34495e; --notice-bg: #fff9db; } 
-        body { font-family: 'Pretendard', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; } 
+        body { font-family: 'Pretendard', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; display: flex; flex-direction: column; min-height: 100vh; } 
+        
+        /* 랜딩 페이지 전용 스타일 */
+        #landingPage { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
+        .landing-box { background: white; padding: 30px 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; width: 100%; max-width: 400px; border: 2px solid transparent; transition: 0.3s; }
+        .landing-box:hover { border-color: var(--main-blue); transform: translateY(-5px); }
+        .landing-input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #eee; border-radius: 10px; font-size: 1rem; box-sizing: border-box; outline: none; transition: 0.2s; }
+        .landing-input:focus { border-color: var(--main-blue); }
+        
+        /* 학급 생성 키 전용 스타일 */
+        .master-pw-input { border-color: var(--admin-red); background-color: #fffaf0; }
+        .master-pw-input:focus { border-color: #d35400; box-shadow: 0 0 5px rgba(231, 76, 60, 0.3); }
+
         .main-wrapper { display: flex; gap: 20px; max-width: 1450px; margin: auto; align-items: flex-start; } 
         .content-area { flex: 1; min-width: 0; } 
         .ranking-side { width: 260px; background: white; padding: 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: sticky; top: 20px; } 
@@ -24,9 +36,12 @@
         .rank-1 .rank-num { color: #d4af37; } 
         .header-stats { background: white; padding: 25px; border-radius: 20px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; } 
         .total-donation-box { font-size: 1.4rem; color: var(--green); font-weight: bold; margin-bottom: 15px; } 
-        .admin-top-group { position: absolute; top: 15px; right: 20px; display: flex; gap: 8px; } 
-        #mainAdminLoginBtn, #adminResetBtn { background: #eee; color: #888; border: 1px solid #ddd; padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 10px; } 
+        .admin-top-group { position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 8px; } 
+        .join-code-badge { background: #eef5ff; color: var(--main-blue); padding: 4px 10px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; border: 1px solid #d0e3ff; }
+        #mainAdminLoginBtn, #adminResetBtn, #adminDeleteClassBtn { background: #eee; color: #888; border: 1px solid #ddd; padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 10px; transition: 0.2s; } 
         #mainAdminLoginBtn.active { background: var(--admin-red); color: white; border: none; } 
+        #adminDeleteClassBtn { color: var(--admin-red); font-weight: bold; }
+        #adminDeleteClassBtn:hover { background: var(--admin-red); color: white; }
         .notice-container { background: var(--notice-bg); border: 2px solid #fab005; border-radius: 12px; padding: 15px; margin: 15px auto; max-width: 800px; transition: 0.3s; } 
         .notice-container.admin-edit-mode { background: #fff; border-style: dashed; border-color: var(--admin-red); box-shadow: 0 0 10px rgba(231, 76, 60, 0.2); } 
         .notice-title { font-weight: bold; color: #f08c00; margin-bottom: 8px; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; } 
@@ -36,7 +51,6 @@
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; } 
         .student-card { background: white; padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s; border: 1px solid #eee; position: relative; min-height: 280px; display: flex; flex-direction: column; justify-content: flex-start; } 
         .student-card:hover { border-color: var(--main-blue); box-shadow: 0 8px 15px rgba(0,0,0,0.1); transform: translateY(-3px); } 
-        .teacher-card { border: 3px solid var(--purple) !important; background: #fdfaff !important; } 
         .gold-card { border: 3px solid var(--gold) !important; background: #fffdf5 !important; box-shadow: 0 0 15px rgba(241, 196, 15, 0.2); } 
         .char-img-container { width: 100px; height: 100px; margin: 10px auto 10px auto; border-radius: 50%; overflow: hidden; border: 3px solid #eee; background: #fafafa; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
         .char-img { width: 100%; height: 100%; object-fit: cover; }
@@ -49,6 +63,8 @@
         .student-card:hover .edit-area { display: flex; } 
         .edit-btn { font-size: 10px; color: #aaa; text-decoration: underline; cursor: pointer; } 
         .edit-btn:hover { color: var(--admin-red); } 
+        .admin-del-btn { position: absolute; top: 10px; right: 10px; background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; color: var(--admin-red); box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10; transition: 0.2s; }
+        .admin-del-btn:hover { background: var(--admin-red); color: white; border-color: var(--admin-red); }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 600px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3); position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -68,10 +84,17 @@
         .admin-item-card { background: white; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 10px 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); transition: all 0.2s; }
         .admin-item-card input { width: 60px; padding: 3px; } 
         .off-item { opacity: 0.5; background: #f9f9f9; } 
-        #detailPage, #shopPage, #quizPage { display: none; max-width: 900px; margin: 20px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); } 
+        
+        #detailPage, #shopPage, #quizPage, #mainPage, #devPage { display: none; flex: 1; }
+        #detailPage, #shopPage, #quizPage { max-width: 900px; margin: 20px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; box-sizing: border-box; } 
+        
+        /* 개발자 대시보드 전용 */
+        #devPage { max-width: 1000px; margin: 40px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; box-sizing: border-box; }
+        
         .medal-shelf { display: flex; flex-wrap: wrap; gap: 10px; background: #f9f9f9; padding: 15px; border-radius: 15px; border: 2px inset #eee; min-height: 50px; margin-bottom: 20px; } 
         .btn { padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; } 
         .btn-blue { background: var(--main-blue); color: white; } 
+        .btn-lg { padding: 15px; font-size: 1.1rem; width: 100%; border-radius: 12px; }
         .item-card { border: 1px solid #eee; padding: 12px; border-radius: 12px; text-align: center; } 
         .item-card.sold-out { opacity: 0.5; filter: grayscale(1); pointer-events: none; } 
         .stat-admin-btn { padding: 2px 6px; font-size: 12px; cursor: pointer; background: #fff; border: 1px solid #ddd; border-radius: 4px; } 
@@ -91,9 +114,128 @@
         .quiz-reward-badge { display: inline-block; background: var(--gold); color: #fff; font-size: 0.85rem; padding: 4px 8px; border-radius: 12px; font-weight: bold; margin-bottom: 10px; text-shadow: 0 1px 1px rgba(0,0,0,0.2); }
         .admin-quiz-form { display: flex; flex-direction: column; gap: 10px; background: #fdfaef; padding: 15px; border-radius: 10px; border: 1px solid #f1c40f; margin-bottom: 20px; }
         .admin-quiz-form input[type="text"], .admin-quiz-form select, .admin-quiz-form textarea { padding: 8px; border-radius: 5px; border: 1px solid #ccc; font-family: inherit; }
+        
+        /* 공통 푸터 스타일 */
+        .site-footer { text-align: center; margin-top: auto; padding: 30px 10px 10px 10px; font-size: 0.75rem; color: #999; line-height: 1.6; }
     </style> 
 </head> 
 <body> 
+
+    <!-- 🌟 학급 생성/참가 랜딩 페이지 -->
+    <div id="landingPage">
+        <h1 style="color:var(--dark); margin-bottom:40px; font-size:2.5rem;">🏫 학급 키우기</h1>
+        
+        <div style="display:flex; gap:30px; flex-wrap:wrap; justify-content:center;">
+            <!-- 학급 참가 (학생용) -->
+            <div class="landing-box">
+                <h3 style="color:var(--main-blue); font-size:1.5rem; margin-top:0;">🚀 만들어진 학급 참가</h3>
+                <p style="color:#666; font-size:0.95rem; margin-bottom:20px;">선생님이 알려주신 참여 코드를 입력하세요.</p>
+                <input type="text" id="joinCodeInput" class="landing-input" placeholder="참여 코드 (예: A1B2C3)">
+                <button class="btn btn-blue btn-lg" onclick="attemptJoin()">입장하기</button>
+                
+                <!-- 참여 코드 찾기 링크 -->
+                <div style="margin-top: 15px; cursor: pointer; color: #888; font-size: 0.85rem; text-decoration: underline;" onclick="openFindCodeModal()">
+                    참여 코드를 잊으셨나요?
+                </div>
+            </div>
+
+            <!-- 학급 생성 (선생님용) -->
+            <div class="landing-box">
+                <h3 style="color:var(--admin-red); font-size:1.5rem; margin-top:0;">✨ 새로운 학급 생성</h3>
+                <p style="color:#666; font-size:0.95rem; margin-bottom:20px;">선생님을 위한 새로운 학급 공간을 만듭니다.</p>
+                
+                <!-- 학급 생성 키 추가 -->
+                <input type="password" id="createMasterPw" class="landing-input master-pw-input" placeholder="학급 생성용 마스터 키">
+                
+                <input type="text" id="createClassName" class="landing-input" placeholder="학급 이름 (예: 6학년 5반)">
+                <input type="password" id="createAdminPw" class="landing-input" placeholder="선생님 비밀번호 (관리자용 설정)">
+                <input type="password" id="createAdminPwConfirm" class="landing-input" placeholder="선생님 비밀번호 확인">
+                <button class="btn btn-lg" style="background:var(--admin-red); color:white;" onclick="createClass()">학급 생성하기</button>
+            </div>
+        </div>
+        
+        <!-- 개발자 모드 접속 버튼 -->
+        <div style="margin-top: 40px; cursor: pointer; color: #aaa; font-size: 0.95rem; font-weight: bold; text-decoration: underline;" onclick="devLogin()">
+            👨‍💻 개발자 모드 접속
+        </div>
+    </div>
+
+    <!-- 참여 코드 찾기 모달 -->
+    <div id="findCodeModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="color:var(--admin-red); margin-top:0;">🔍 참여 코드 찾기</h2>
+            
+            <div style="margin-bottom: 15px; display: flex; justify-content: center; gap: 15px;">
+                <label style="cursor:pointer;"><input type="radio" name="findRole" value="teacher" checked onchange="toggleFindRole()"> 👨‍🏫 선생님</label>
+                <label style="cursor:pointer;"><input type="radio" name="findRole" value="student" onchange="toggleFindRole()"> 👦👧 학생</label>
+            </div>
+
+            <p id="findCodeDesc" style="color:#555; font-size:0.95rem;">학급 이름과 선생님 비밀번호를 입력해주세요.</p>
+            
+            <div class="setup-input-group">
+                <label id="findLabel1">🏫 학급 이름</label>
+                <input type="text" id="findInput1" placeholder="예: 6학년 5반">
+            </div>
+            <div class="setup-input-group">
+                <label id="findLabel2">🔑 선생님 비밀번호</label>
+                <input type="password" id="findInput2" placeholder="관리자용 설정 비밀번호">
+            </div>
+            
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn" style="flex:1; background:#ccc; color:#333;" onclick="closeFindCodeModal()">취소</button>
+                <button class="btn" style="flex:1; background:var(--admin-red); color:white;" onclick="findJoinCode()">코드 찾기</button>
+            </div>
+            <div id="foundCodeResult" style="margin-top: 15px; font-weight: bold; color: var(--main-blue); font-size: 1.2rem; display: none;"></div>
+        </div>
+    </div>
+
+    <!-- 👨‍💻 개발자 대시보드 (전체 학급 관리 및 전역 설정 관리) -->
+    <div id="devPage">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #eee; padding-bottom:15px; margin-bottom:20px;">
+            <h2 style="margin:0; color:var(--dark);">👨‍💻 개발자 대시보드 (전체 관리)</h2>
+            <button class="btn" onclick="closeDevMode()">← 랜딩 페이지로</button>
+        </div>
+
+        <!-- 전역 마스터 키 설정 패널 -->
+        <div style="background:#f4f9ff; border:2px solid var(--main-blue); padding:20px; border-radius:15px; margin-bottom:25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <h3 style="color:#2c3e50; margin-top:0;">🔑 학급 생성용 마스터 키 설정</h3>
+            <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">새로운 학급을 만들 때 학생이 무분별하게 생성하지 못하도록 공통 마스터 키를 설정합니다.</p>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <input type="text" id="devMasterKeyInput" style="flex:1; max-width: 300px; padding:8px; border-radius:5px; border:1px solid #ccc; outline:none;" placeholder="마스터 키 입력">
+                <button class="btn btn-blue" onclick="saveMasterKey()">키 변경하기</button>
+            </div>
+        </div>
+
+        <!-- 전역 진화 일러스트 관리 패널 (학급에서 이동됨) -->
+        <div style="background:#fffdf5; border:2px solid var(--gold); padding:20px; border-radius:15px; margin-bottom:25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <h3 style="color:#b58900; margin-top:0;">🖼️ 전역 진화 일러스트(URL) 관리</h3>
+            <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">이곳에서 등록한 일러스트는 <b>모든 생성된 학급</b>에 공통으로 적용됩니다.</p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                <select id="evoGenInput">
+                    <option value="M">남학생</option>
+                    <option value="F">여학생</option>
+                </select>
+                <select id="evoTierInput">
+                    <option value="1">1단계 (0~100)</option>
+                    <option value="2">2단계 (101~200)</option>
+                    <option value="3">3단계 (201~300)</option>
+                    <option value="4">4단계 (301~400)</option>
+                    <option value="5">5단계 (401~499)</option>
+                    <option value="6">6단계 (능력치 500 달성)</option>
+                </select>
+                <select id="evoClassInput">
+                    <option value="0">직업 1 (왼쪽 팝업)</option>
+                    <option value="1">직업 2 (중앙 팝업)</option>
+                    <option value="2">직업 3 (오른쪽 팝업)</option>
+                </select>
+                <input type="text" id="evoUrlInput" placeholder="https://... (이미지 주소 복사 붙여넣기)" style="flex:1; min-width:200px; padding:8px; border-radius:5px; border:1px solid #ccc; outline:none;">
+                <button class="btn" style="background:var(--gold); color:#856404; border:1px solid #b58900;" onclick="saveEvoImage()">전역 서버에 적용</button>
+            </div>
+        </div>
+
+        <h3 style="color:var(--dark); margin-bottom:15px;">📂 생성된 전체 학급 목록</h3>
+        <div id="devClassList" style="display: flex; flex-direction: column; gap: 15px;"></div>
+    </div>
 
     <!-- 초기 설정 모달 -->
     <div id="setupModal" class="modal-overlay">
@@ -125,15 +267,18 @@
         </div>
     </div>
 
+    <!-- 메인 화면 -->
     <div id="mainPage"> 
         <div class="main-wrapper"> 
             <div class="content-area"> 
                 <div class="header-stats"> 
                     <div class="admin-top-group"> 
+                        <span class="join-code-badge" title="이 코드를 학생들에게 공유하세요">참여 코드: <span id="displayJoinCode"></span></span>
                         <button id="mainAdminLoginBtn" onclick="toggleAdmin()">🔒 관리자 로그인</button> 
-                        <button id="adminResetBtn" onclick="resetAllData()">⚠️ 전체 초기화</button> 
+                        <button id="adminResetBtn" onclick="resetToDefault()" style="display:none;">⚠️ 현재 학급 초기화</button> 
+                        <button id="adminDeleteClassBtn" onclick="deleteCurrentClass()" style="display:none;">🗑️ 학급 삭제하기</button>
                     </div> 
-                    <h1>🏫 6학년 5반 키우기</h1> 
+                    <h1 id="mainTitle">🏫 학급 키우기</h1> 
                     <div class="total-donation-box">🌟 우리 반 누적 기부액: <span id="totalDonationDisplay">0</span>원</div> 
                     
                     <div id="noticeBox" class="notice-container"> 
@@ -148,34 +293,6 @@
                     </div> 
                 </div> 
                 <div id="studentGrid" class="grid-container"></div> 
-                
-                <!-- 관리자 패널: 진화 일러스트 -->
-                <div id="adminEvoPanel" class="admin-manager-panel">
-                    <h2 style="color:var(--admin-red); margin-top:0;">🖼️ 진화 일러스트(URL) 관리</h2>
-                    <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">외부에서 생성한 캐릭터 이미지의 웹 링크(URL)를 직업별로 등록하세요.</p>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; background:#fdfaef; padding:15px; border-radius:10px; border:1px solid #f1c40f;">
-                        <select id="evoGenInput">
-                            <option value="M">남학생</option>
-                            <option value="F">여학생</option>
-                        </select>
-                        <select id="evoTierInput">
-                            <option value="1">1단계 (0~100)</option>
-                            <option value="2">2단계 (101~200)</option>
-                            <option value="3">3단계 (201~300)</option>
-                            <option value="4">4단계 (301~400)</option>
-                            <option value="5">5단계 (401~499)</option>
-                            <option value="6">6단계 (능력치 500 달성)</option>
-                            <option value="99">관리자(선생님) 전용</option>
-                        </select>
-                        <select id="evoClassInput">
-                            <option value="0">직업 1 (왼쪽 팝업)</option>
-                            <option value="1">직업 2 (중앙 팝업)</option>
-                            <option value="2">직업 3 (오른쪽 팝업)</option>
-                        </select>
-                        <input type="text" id="evoUrlInput" placeholder="https://... (이미지 주소 복사 붙여넣기)" style="flex:1; min-width:200px; padding:8px; border-radius:5px; border:1px solid #ccc; outline:none;">
-                        <button class="btn btn-blue" onclick="saveEvoImage()">이미지 서버에 적용</button>
-                    </div>
-                </div>
 
                 <!-- 관리자 패널: 상점 -->
                 <div id="adminShopPanel" class="admin-manager-panel"> 
@@ -297,7 +414,8 @@
                         <button class="btn" style="background:var(--dark); color:white; padding:5px 10px;" onclick="resetStudentPw()">재설정</button> 
                     </div>
                     <div style="margin-top:20px; padding-top:10px; border-top:1px dashed #ffcfcf;">
-                        <button class="btn" style="background:orange; color:white; width:100%;" onclick="resetIndividualData()">⚠️ 이 학생만 초기화</button>
+                        <button class="btn" style="background:orange; color:white; width:100%; margin-bottom:10px;" onclick="resetIndividualData()">⚠️ 이 학생만 초기화</button>
+                        <button class="btn" style="background:darkred; color:white; width:100%;" onclick="deleteCurrentStudent()">🗑️ 이 학생 삭제</button>
                     </div>
                 </div> 
             </div>
@@ -318,8 +436,14 @@
         <div id="potionShopGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;"></div> 
     </div>
 
+    <!-- 공통 푸터 -->
+    <div class="site-footer">
+        Copyright © 2026 KEUNHO SHIN. All rights reserved.<br>
+        For God so loved the world, that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life. [JOHN 3:16]
+    </div>
+
     <script> 
-        // 1. Firebase 설정 (기존 정보 유지)
+        // 1. Firebase 설정
         const firebaseConfig = { 
             apiKey: "AIzaSyBxZ9j03f982mny1wpotzfjkR81onkpSXY", 
             authDomain: "class-training-c1f76.firebaseapp.com", 
@@ -335,8 +459,18 @@
 
         // 2. 변수 및 데이터 설정
         let isAdmin = false; 
-        const ADMIN_TOKEN = "dHBmYnNjaDA2MDVAIw=="; 
         
+        // 개발자 모드 전용 암호화 토큰 (Base64 인코딩: rootwisdomlove)
+        const DEV_TOKEN = "cm9vdHdpc2RvbWxvdmU=";
+        
+        // 동적 마스터 키 설정 (기본값 설정용 변수)
+        let dynamicMasterKey = "class1234";
+
+        // 다중 학급 지원을 위한 글로벌 변수
+        let currentClassCode = null;
+        let currentClassName = "";
+        let currentAdminPw = "";
+
         let currentIdx = null; 
         let students = []; 
         let top3Ids = []; 
@@ -347,6 +481,17 @@
         let noticeText = ""; 
         let tempQuizImageBase64 = ""; 
 
+        // 🌟 전역 마스터 키 실시간 로드
+        db.ref('globalConfig/masterKey').on('value', (snapshot) => {
+            if (snapshot.exists()) {
+                dynamicMasterKey = snapshot.val();
+            } else {
+                db.ref('globalConfig/masterKey').set(dynamicMasterKey);
+            }
+            const devKeyInput = document.getElementById('devMasterKeyInput');
+            if (devKeyInput) devKeyInput.value = dynamicMasterKey;
+        });
+
         const evolutionData = {
             M: {
                 1: [{img: '', n:'초보 검사'}, {img: '', n:'견습 마법사'}, {img: '', n:'떠돌이 닌자'}],
@@ -354,8 +499,7 @@
                 3: [{img: '', n:'성기사'}, {img: '', n:'대마법사'}, {img: '', n:'그림자 마스터'}],
                 4: [{img: '', n:'드래곤 나이트'}, {img: '', n:'아크메이지'}, {img: '', n:'팬텀 로드'}],
                 5: [{img: '', n:'전설의 용사'}, {img: '', n:'신비의 현자'}, {img: '', n:'어둠의 지배자'}],
-                6: [{img: '', n:'빛의 검황'}, {img: '', n:'초월의 대마법사'}, {img: '', n:'그림자 군주'}],
-                99: [{img: '', n:'사랑의 선생님'}, {img: '', n:'사랑의 선생님'}, {img: '', n:'사랑의 선생님'}]
+                6: [{img: '', n:'빛의 검황'}, {img: '', n:'초월의 대마법사'}, {img: '', n:'그림자 군주'}]
             },
             F: {
                 1: [{img: '', n:'초보 검사'}, {img: '', n:'견습 마법사'}, {img: '', n:'떠돌이 궁수'}],
@@ -363,17 +507,16 @@
                 3: [{img: '', n:'성기사 단장'}, {img: '', n:'대자연의 마법사'}, {img: '', n:'스나이퍼'}],
                 4: [{img: '', n:'드래곤 슬레이어'}, {img: '', n:'하이 엘프'}, {img: '', n:'윈드 레인저'}],
                 5: [{img: '', n:'전설의 여전사'}, {img: '', n:'어둠의 대마법사'}, {img: '', n:'하늘의 궁수'}],
-                6: [{img: '', n:'천검의 여제'}, {img: '', n:'볓빛의 수호자'}, {img: '', n:'천상의 궁신'}],
-                99: [{img: '', n:'사랑의 선생님'}, {img: '', n:'사랑의 선생님'}, {img: '', n:'사랑의 선생님'}]
+                6: [{img: '', n:'천검의 여제'}, {img: '', n:'볓빛의 수호자'}, {img: '', n:'천상의 궁신'}]
             }
         };
 
         const defaultTitles = [ 
-            { id: 't1', name: '6학년을 시작하는 자', icon: '🌱', price: 3000, effect: '모든 능력치 +1', onSale: true }, 
-            { id: 't2', name: '6학년을 조금 아는 자', icon: '🌿', price: 15000, effect: '모든 능력치 +5', onSale: true }, 
-            { id: 't3', name: '6학년을 지배하는 자', icon: '🌳', price: 30000, effect: '모든 능력치 +10', onSale: true }, 
+            { id: 't1', name: '시작하는 자', icon: '🌱', price: 3000, effect: '모든 능력치 +1', onSale: true }, 
+            { id: 't2', name: '조금 아는 자', icon: '🌿', price: 15000, effect: '모든 능력치 +5', onSale: true }, 
+            { id: 't3', name: '지배하는 자', icon: '🌳', price: 30000, effect: '모든 능력치 +10', onSale: true }, 
             { id: 't10', name: '재력과시', icon: '💎', price: 50000, effect: '모든 능력치 +20', onSale: true }, 
-            { id: 't4', name: '6학년 5반의 군주', icon: '👑', price: 999999999, effect: '모든 능력치 100 달성', onSale: true }, 
+            { id: 't4', name: '학급의 군주', icon: '👑', price: 999999999, effect: '모든 능력치 100 달성', onSale: true }, 
             { id: 't5', name: '공부왕', icon: '📖', price: 7000, effect: '지력 +10', onSale: true }, 
             { id: 't6', name: '운동왕', icon: '⚽', price: 7000, effect: '체력 +10', onSale: true }, 
             { id: 't7', name: '창의왕', icon: '💡', price: 7000, effect: '창의성 +10', onSale: true }, 
@@ -410,21 +553,254 @@
             { level: 7, cost: 0, prob: 0, effect: 20, reward: 0 } 
         ];
 
-        function updateStudentDB(idx) { if (!db || !students[idx]) return; db.ref(`class65_root/students/${idx}`).update(students[idx]); }
-        function updateShopDB() { if (!db) return; db.ref('class65_root').update({ titleData: titleData, potionData: potionData }); }
-        function updateQuizDB() { if (!db) return; db.ref('class65_root').update({ quizData: quizData }); }
-        function saveNotice() { if (!db || !isAdmin) return; const noticeVal = document.getElementById('noticeContent').innerText; db.ref('class65_root').update({ noticeText: noticeVal }); alert("✅ 저장되었습니다."); }
+        // 유틸 함수
+        function updateStudentDB(idx) { if (!db || !students[idx] || !currentClassCode) return; db.ref(`classes/${currentClassCode}/students/${idx}`).update(students[idx]); }
+        function updateShopDB() { if (!db || !currentClassCode) return; db.ref(`classes/${currentClassCode}`).update({ titleData: titleData, potionData: potionData }); }
+        function updateQuizDB() { if (!db || !currentClassCode) return; db.ref(`classes/${currentClassCode}`).update({ quizData: quizData }); }
+        function saveNotice() { if (!db || !isAdmin || !currentClassCode) return; const noticeVal = document.getElementById('noticeContent').innerText; db.ref(`classes/${currentClassCode}`).update({ noticeText: noticeVal }); alert("✅ 저장되었습니다."); }
+
+        // --- 🚀 코드 찾기 로직 ---
+        function toggleFindRole() {
+            const role = document.querySelector('input[name="findRole"]:checked').value;
+            const desc = document.getElementById('findCodeDesc');
+            const label1 = document.getElementById('findLabel1');
+            const label2 = document.getElementById('findLabel2');
+            const input1 = document.getElementById('findInput1');
+            const input2 = document.getElementById('findInput2');
+
+            document.getElementById('foundCodeResult').style.display = 'none';
+            input1.value = '';
+            input2.value = '';
+
+            if (role === 'teacher') {
+                desc.innerText = "학급 이름과 선생님 비밀번호를 입력해주세요.";
+                label1.innerText = "🏫 학급 이름";
+                input1.placeholder = "예: 6학년 5반";
+                label2.innerText = "🔑 선생님 비밀번호";
+                input2.placeholder = "관리자용 설정 비밀번호";
+            } else {
+                desc.innerText = "본인 이름과 설정한 캐릭터 비밀번호를 입력해주세요.";
+                label1.innerText = "👤 학생 이름";
+                input1.placeholder = "예: 홍길동";
+                label2.innerText = "🔐 내 비밀번호";
+                input2.placeholder = "캐릭터 생성 시 설정한 비밀번호";
+            }
+        }
+
+        function openFindCodeModal() {
+            document.querySelector('input[name="findRole"][value="teacher"]').checked = true;
+            toggleFindRole();
+            document.getElementById('findCodeModal').style.display = 'flex';
+        }
+
+        function closeFindCodeModal() {
+            document.getElementById('findCodeModal').style.display = 'none';
+        }
+
+        function findJoinCode() {
+            const role = document.querySelector('input[name="findRole"]:checked').value;
+            const val1 = document.getElementById('findInput1').value.trim();
+            const val2 = document.getElementById('findInput2').value.trim();
+
+            if (!val1 || !val2) return alert("모든 항목을 입력해주세요.");
+
+            db.ref('classes').once('value').then(snapshot => {
+                const data = snapshot.val();
+                let foundCode = null;
+
+                if (data) {
+                    for (let code in data) {
+                        const cls = data[code];
+                        if (role === 'teacher') {
+                            if (cls.className === val1 && cls.adminPw === val2) {
+                                foundCode = code;
+                                break;
+                            }
+                        } else {
+                            // 학생 검색 모드: 해당 학급의 학생 목록을 순회
+                            if (cls.students) {
+                                const studentList = Object.values(cls.students);
+                                const foundStudent = studentList.find(s => s && s.name === val1 && s.pw === val2);
+                                if (foundStudent) {
+                                    foundCode = code;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                const resultDiv = document.getElementById('foundCodeResult');
+                if (foundCode) {
+                    resultDiv.innerHTML = `🎉 참여 코드: <span style="color:var(--admin-red);">${foundCode}</span>`;
+                    resultDiv.style.display = 'block';
+                } else {
+                    alert("일치하는 정보가 없습니다. 다시 확인해주세요.");
+                }
+            }).catch(e => {
+                alert("오류가 발생했습니다: " + e.message);
+            });
+        }
+
+        // --- 🚀 개발자 모드 로직 ---
+        function devLogin() {
+            const pw = prompt("개발자 암호를 입력하세요.");
+            if (!pw) return;
+            // Base64 인코딩으로 비교
+            if (btoa(pw) === DEV_TOKEN) {
+                document.getElementById('landingPage').style.display = 'none';
+                document.getElementById('devPage').style.display = 'block';
+                loadDevClasses();
+            } else {
+                alert("암호가 틀렸습니다.");
+            }
+        }
+
+        function closeDevMode() {
+            document.getElementById('devPage').style.display = 'none';
+            document.getElementById('landingPage').style.display = 'flex';
+        }
+
+        function saveMasterKey() {
+            const newKey = document.getElementById('devMasterKeyInput').value.trim();
+            if (!newKey) return alert("키를 입력해주세요.");
+            if (confirm(`학급 생성용 마스터 키를 [${newKey}]로 변경하시겠습니까?`)) {
+                db.ref('globalConfig/masterKey').set(newKey).then(() => {
+                    alert("✅ 마스터 키가 성공적으로 변경되었습니다.");
+                });
+            }
+        }
+
+        function loadDevClasses() {
+            db.ref('classes').once('value').then(snapshot => {
+                const data = snapshot.val();
+                const listDiv = document.getElementById('devClassList');
+                if (!data) {
+                    listDiv.innerHTML = "<div style='color:#888; text-align:center;'>생성된 학급이 없습니다.</div>";
+                    return;
+                }
+                let html = "";
+                for (let code in data) {
+                    const cls = data[code];
+                    const studentCount = cls.students ? cls.students.length : 0;
+                    html += `
+                    <div style="background:#fdfdff; border:1px solid #ddd; padding:15px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <strong style="font-size:1.2rem; color:var(--dark);">${cls.className}</strong> 
+                            <span style="background:var(--main-blue); color:white; padding:2px 8px; border-radius:5px; font-size:0.8rem; margin-left:10px;">코드: ${code}</span><br>
+                            <span style="font-size:0.9rem; color:#666; display:inline-block; margin-top:5px;">선생님 PW: <b style="color:var(--admin-red);">${cls.adminPw}</b> | 등록 학생 수: ${studentCount}명</span>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn btn-blue" onclick="enterClassRoom('${code}')">입장</button>
+                            <button class="btn" style="background:var(--admin-red); color:white;" onclick="devDeleteClass('${code}', '${cls.className}')">삭제</button>
+                        </div>
+                    </div>
+                    `;
+                }
+                listDiv.innerHTML = html;
+            });
+        }
+
+        function devDeleteClass(code, name) {
+            if (confirm(`⚠️ 정말 [${name}] 학급(코드:${code})을 데이터베이스에서 영구 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+                db.ref(`classes/${code}`).remove().then(() => {
+                    alert("학급이 정상적으로 삭제되었습니다.");
+                    loadDevClasses(); // 목록 갱신
+                });
+            }
+        }
+
+        // 🌟 전역 커스텀 일러스트 실시간 로드 및 동기화
+        db.ref('customEvoImages').on('value', (snapshot) => {
+            customEvoImages = snapshot.val() || {};
+            applyCustomEvoImages();
+            // 화면 갱신이 필요하다면 (이미 학급에 들어와 있는 상태라면)
+            if (currentClassCode && document.getElementById('mainPage').style.display === 'block') {
+                renderGrid();
+                if(currentIdx !== null) updateUI();
+            }
+        });
+
+        // --- 🚀 다중 학급 생성 및 참가 로직 ---
+
+        function generateCode() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
+        function createClass() {
+            const masterPw = document.getElementById('createMasterPw').value.trim();
+            const className = document.getElementById('createClassName').value.trim();
+            const adminPw = document.getElementById('createAdminPw').value.trim();
+            const adminPwConfirm = document.getElementById('createAdminPwConfirm').value.trim();
+            
+            // 1. 학급 생성 키 확인
+            if (!masterPw) return alert("학급 생성용 마스터 키를 입력해주세요.");
+            if (masterPw !== dynamicMasterKey) {
+                return alert("학급 생성용 마스터 키가 일치하지 않습니다. 선생님께 문의하세요.");
+            }
+            
+            if (!className || !adminPw || !adminPwConfirm) return alert("학급 이름과 선생님 비밀번호를 모두 입력해주세요!");
+            if (adminPw !== adminPwConfirm) return alert("선생님 비밀번호가 일치하지 않습니다. 다시 확인해주세요.");
+
+            const newCode = generateCode();
+            const initialData = {
+                className: className,
+                adminPw: adminPw,
+                students: [], 
+                noticeText: "반갑습니다! 공지사항을 입력하세요.",
+                titleData: defaultTitles,
+                potionData: defaultPotions,
+                quizData: []
+            };
+
+            db.ref(`classes/${newCode}`).set(initialData).then(() => {
+                alert(`🎉 [${className}] 학급이 생성되었습니다!\n\n학생들에게 공유할 참여 코드는 [ ${newCode} ] 입니다.`);
+                
+                // 생성 폼 초기화
+                document.getElementById('createMasterPw').value = "";
+                document.getElementById('createClassName').value = "";
+                document.getElementById('createAdminPw').value = "";
+                document.getElementById('createAdminPwConfirm').value = "";
+                
+                enterClassRoom(newCode);
+            }).catch(e => alert("학급 생성 실패: " + e.message));
+        }
+
+        function attemptJoin() {
+            const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
+            if (!code) return alert("참여 코드를 입력해주세요.");
+            enterClassRoom(code);
+        }
+
+        function enterClassRoom(code) {
+            db.ref(`classes/${code}`).once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    currentClassCode = code;
+                    document.getElementById('displayJoinCode').innerText = code;
+                    document.getElementById('landingPage').style.display = 'none';
+                    document.getElementById('devPage').style.display = 'none'; // 개발자 모드에서 입장할 경우를 위해 추가
+                    document.getElementById('mainPage').style.display = 'block';
+                    initRealtimeSync(); 
+                } else {
+                    alert("존재하지 않는 참여 코드입니다. 다시 확인해주세요.");
+                }
+            });
+        }
 
         function initRealtimeSync() { 
-            db.ref('class65_root').on('value', (snapshot) => { 
+            if (!currentClassCode) return;
+            db.ref(`classes/${currentClassCode}`).on('value', (snapshot) => { 
                 const data = snapshot.val(); 
                 if (data) { 
+                    currentClassName = data.className || "학급";
+                    currentAdminPw = data.adminPw || "";
+                    document.getElementById('mainTitle').innerText = `🏫 ${currentClassName} 키우기`;
+
                     students = data.students || []; 
                     quizData = data.quizData || [];
                     titleData = data.titleData || defaultTitles;
                     potionData = data.potionData || defaultPotions;
-                    customEvoImages = data.customEvoImages || {}; 
-                    
+
                     applyCustomEvoImages(); 
 
                     noticeText = data.noticeText || "반갑습니다! 공지사항을 입력하세요."; 
@@ -441,9 +817,11 @@
                         renderAdminShop(); 
                         renderAdminQuizList();
                     }
-                } else resetToDefault(); 
+                }
             });
         }
+
+        // ----------------------------------------
 
         function applyCustomEvoImages() {
             for(let g in evolutionData) {
@@ -466,32 +844,85 @@
             let c = document.getElementById('evoClassInput').value;
             let url = document.getElementById('evoUrlInput').value.trim();
             if(!url) return alert("이미지 URL을 붙여넣으세요!");
+            
             customEvoImages[`${g}_${t}_${c}`] = url;
-            if (db) {
-                db.ref('class65_root/customEvoImages').set(customEvoImages).then(() => {
-                    alert("✅ 캐릭터 이미지가 성공적으로 데이터베이스에 적용되었습니다.");
-                    document.getElementById('evoUrlInput').value = ""; 
+            
+            db.ref(`customEvoImages`).set(customEvoImages).then(() => {
+                alert("✅ 캐릭터 이미지가 성공적으로 전역 데이터베이스에 적용되었습니다.");
+                document.getElementById('evoUrlInput').value = ""; 
+            });
+        }
+
+        function resetToDefault() {
+            if(!isAdmin || !currentClassCode) return;
+            if(confirm(`[${currentClassName}] 학급의 학생 데이터를 모두 삭제하고 초기화하시겠습니까?\n(이 작업은 되돌릴 수 없습니다)`)){
+                if (prompt("삭제승인 입력") === "삭제승인") {
+                    students = []; 
+                    db.ref(`classes/${currentClassCode}`).update({
+                        students: students, noticeText: "반갑습니다!", titleData: defaultTitles, potionData: defaultPotions, quizData: []
+                    });
+                    alert("현재 학급 초기화가 완료되었습니다.");
+                }
+            }
+        }
+
+        function deleteCurrentClass() {
+            if(!isAdmin || !currentClassCode) return;
+            if(confirm(`⚠️ 정말 [${currentClassName}] 학급 자체를 영구 삭제하시겠습니까?\n(학생 데이터, 상점, 퀴즈 등 모든 정보가 영구 삭제되며 복구할 수 없습니다)`)){
+                if (prompt("학급을 완전히 삭제하려면 '학급삭제'를 입력하세요") === "학급삭제") {
+                    db.ref(`classes/${currentClassCode}`).remove().then(() => {
+                        alert("학급이 영구적으로 삭제되었습니다. 메인 화면으로 돌아갑니다.");
+                        location.reload(); 
+                    }).catch(e => alert("오류 발생: " + e.message));
+                } else {
+                    alert("입력한 단어가 일치하지 않아 삭제가 취소되었습니다.");
+                }
+            }
+        }
+
+        function addNewStudent() {
+            if (!isAdmin || !currentClassCode) return;
+            const newNum = students.length > 0 ? Math.max(...students.map(s => s.num)) + 1 : 1;
+            const name = prompt("추가할 학생의 이름을 입력하세요.", `${newNum}번 학생`);
+            if (!name) return;
+            const newStudent = {
+                id: Date.now(), num: newNum, name: name,
+                money: 10000, donation: 0, stats: { "체력": 5, "지력": 5, "창의성": 5, "정신력": 5, "인성": 5 },
+                myTitles: [], solvedQuizzes: [],
+                pw: null, gender: null, characterStage: 0, characterImg: null, characterName: null,
+                enhanceLevel: 0
+            };
+            students.push(newStudent);
+            db.ref(`classes/${currentClassCode}/students`).set(students).then(() => {
+                alert(`${name} 학생이 정상적으로 추가되었습니다.`);
+            });
+        }
+
+        function deleteStudentBtn(e, idx) {
+            e.stopPropagation(); 
+            if (!isAdmin || !currentClassCode) return;
+            const s = students[idx];
+            if (confirm(`정말 [${s.num}번 ${s.name}] 학생을 삭제하시겠습니까?\n(이 작업은 되돌릴 수 없으며 데이터가 영구 삭제됩니다.)`)) {
+                students.splice(idx, 1);
+                db.ref(`classes/${currentClassCode}/students`).set(students);
+            }
+        }
+
+        function deleteCurrentStudent() {
+            if (!isAdmin || !currentClassCode) return;
+            const s = students[currentIdx];
+            if (confirm(`정말 [${s.name}] 학생을 삭제하시겠습니까?\n(이 작업은 되돌릴 수 없으며 복구되지 않습니다)`)) {
+                students.splice(currentIdx, 1);
+                db.ref(`classes/${currentClassCode}/students`).set(students).then(() => {
+                    alert("해당 학생이 삭제되었습니다.");
+                    showMain();
                 });
             }
         }
 
-        function resetToDefault() {
-            students = Array.from({ length: 25 }, (_, i) => ({
-                id: Date.now() + i, num: i + 1, name: (i === 24) ? "선생님" : `${i + 1}번 학생`,
-                money: 10000, donation: 0, stats: { "체력": 5, "지력": 5, "창의성": 5, "정신력": 5, "인성": 5 },
-                myTitles: [], solvedQuizzes: [], 
-                pw: null, gender: null, characterStage: 0, characterImg: null, characterName: null,
-                enhanceLevel: 0 
-            }));
-            db.ref('class65_root').set({
-                students: students, noticeText: "반갑습니다!", titleData: defaultTitles, potionData: defaultPotions, quizData: [], customEvoImages: {}
-            });
-            alert("전체 초기화 완료.");
-        }
-
         function getExpectedTier(idx) {
-            if (idx === 24) return 99;
             const s = students[idx];
+            if (!s) return 1;
             const statSum = Object.values(s.stats).reduce((a, b) => a + b, 0);
             if(statSum <= 100) return 1; 
             if(statSum <= 200) return 2; 
@@ -503,10 +934,10 @@
 
         function checkEvolution(idx) {
             const s = students[idx]; 
-            if (!s.gender) return false;
+            if (!s || !s.gender) return false;
             const expectedTier = getExpectedTier(idx);
             if (expectedTier > (s.characterStage || 0)) {
-                const nextTier = (idx === 24) ? 99 : (s.characterStage || 0) + 1;
+                const nextTier = (s.characterStage || 0) + 1;
                 openEvolutionModal(idx, nextTier);
                 return true;
             }
@@ -519,7 +950,7 @@
             let descText = `능력치가 성장하여 새로운 직업으로 전직합니다!`;
             if(tier === 1) { titleText = "🌟 당신의 첫 캐릭터를 선택하세요!"; descText = "모험을 시작할 캐릭터를 골라주세요."; } 
             else if (tier === 6) { titleText = "🔥 궁극의 경지, 능력치 500 달성!"; descText = "모든 능력치를 극한으로 끌어올린 자만의 특권입니다."; } 
-            else if (tier === 99) { titleText = "👑 선생님 전용 캐릭터 설정"; descText = "반을 이끌어갈 관리자 캐릭터를 선택하세요."; }
+            
             document.getElementById('evoTitle').innerText = titleText;
             document.getElementById('evoDesc').innerText = descText;
             let html = '';
@@ -572,6 +1003,7 @@
             saveNoticeBtn.style.display = isAdmin ? "inline-block" : "none";
             const grid = document.getElementById('studentGrid'); 
             grid.innerHTML = ''; let totalD = 0; 
+            
             students.forEach((s, idx) => { 
                 totalD += s.donation; 
                 const statSum = Object.values(s.stats).reduce((a, b) => a + b, 0); 
@@ -583,12 +1015,16 @@
                     enhanceStarsHtml = `<div class="card-enhance-stars">${'⭐'.repeat(s.enhanceLevel)}</div>`;
                 } else { enhanceStarsHtml = `<div class="card-enhance-stars"></div>`; }
                 const card = document.createElement('div'); 
-                card.className = `student-card ${idx === 24 ? 'teacher-card' : (top3Ids.includes(s.id) ? 'gold-card' : '')}`; 
+                card.className = `student-card ${top3Ids.includes(s.id) ? 'gold-card' : ''}`; 
+                
+                let adminDeleteBtn = isAdmin ? `<button class="admin-del-btn" title="학생 삭제" onclick="deleteStudentBtn(event, ${idx})">❌</button>` : '';
+
                 card.innerHTML = ` 
-                    <div style="font-size:12px; color:#888;">${idx === 24 ? '' : s.num + '번'}</div> 
+                    ${adminDeleteBtn}
+                    <div style="font-size:12px; color:#888;">${s.num}번</div> 
                                         ${enhanceStarsHtml} 
                     <div class="char-img-container">${charDisplay}</div>
-                    <div style="font-weight:bold; font-size:1.1rem; ${idx !== 24 ? 'margin-bottom:0px;' : 'margin-bottom:5px;'}">${s.name}</div> 
+                    <div style="font-weight:bold; font-size:1.1rem; margin-bottom:0px;">${s.name}</div> 
                     <div class="card-titles" style="min-height: 25px; margin: 5px 0;">${(s.myTitles || []).map(t => `<span title="${t.name}">${t.icon}</span>`).join('')}</div>
                     <div class="card-money" style="font-size:0.9rem; color:#d35400; font-weight:bold;">💰 ${s.money.toLocaleString()}원</div>
                     <div style="margin-top: 5px;"><span class="personal-stat-sum">⚡ 능력치 ${statSum}</span></div> 
@@ -598,12 +1034,29 @@
                 card.onclick = () => showDetail(idx); 
                 grid.appendChild(card); 
             }); 
+
+            if (isAdmin) {
+                const addCard = document.createElement('div');
+                addCard.className = 'student-card';
+                addCard.style.display = 'flex';
+                addCard.style.alignItems = 'center';
+                addCard.style.justifyContent = 'center';
+                addCard.style.background = '#fcfcfc';
+                addCard.style.border = '2px dashed #ccc';
+                addCard.style.cursor = 'pointer';
+                addCard.innerHTML = `
+                    <div style="font-size: 2.5rem; color: #aaa;">➕</div>
+                    <div style="font-size: 1.1rem; font-weight: bold; color: #888; margin-top: 10px;">새로운 학생 추가</div>
+                `;
+                addCard.onclick = addNewStudent;
+                grid.appendChild(addCard);
+            }
+
             document.getElementById('totalDonationDisplay').innerText = totalD.toLocaleString(); 
         }
 
         function updateRanking() { 
-            const onlyStudents = students.filter((_, idx) => idx !== 24); 
-            const sortedByStat = [...onlyStudents].sort((a, b) => { 
+            const sortedByStat = [...students].sort((a, b) => { 
                 const sumA = Object.values(a.stats).reduce((p, c) => p + c, 0); 
                 const sumB = Object.values(b.stats).reduce((p, c) => p + c, 0); 
                 return sumB - sumA; 
@@ -617,7 +1070,7 @@
                 </div>`; 
             }); 
             document.getElementById('statRankList').innerHTML = statHtml; 
-            const donSorted = [...onlyStudents].sort((a, b) => b.donation - a.donation).slice(0, 10); 
+            const donSorted = [...students].sort((a, b) => b.donation - a.donation).slice(0, 10); 
             let donHtml = ''; 
             donSorted.forEach((s, i) => { 
                 if(s.donation <= 0) return; 
@@ -626,26 +1079,31 @@
             document.getElementById('donationRankList').innerHTML = donHtml; 
         } 
 
+        // 🌟 수정된 자동 칭호 확인 로직
         function checkAutoTitles(idx) {
             const s = students[idx];
-            if (!s.myTitles) s.myTitles = [];
+            if (!s) return;
+            if (!s.myTitles) s.myTitles = []; // Firebase 빈 배열 소실 방지 처리
+            
             let updated = false;
-            const statSum = Object.values(s.stats).reduce((a, b) => a + b, 0);
+            
+            // cond 속성을 즉시 평가(boolean)에서 지연 평가(함수)로 변경하여 항상 최신 스탯을 읽어옵니다.
             const conditions = [
-                { id: 's1', cond: s.stats['체력'] >= 60, effect: () => s.stats['체력'] += 10 },
-                { id: 's2', cond: s.stats['지력'] >= 60, effect: () => s.stats['지력'] += 10 },
-                { id: 's3', cond: s.stats['창의성'] >= 60, effect: () => s.stats['창의성'] += 10 },
-                { id: 's4', cond: s.stats['정신력'] >= 60, effect: () => s.stats['정신력'] += 10 },
-                { id: 's5', cond: s.stats['인성'] >= 60, effect: () => s.stats['인성'] += 10 },
-                { id: 's6', cond: statSum >= 350, effect: () => Object.keys(s.stats).forEach(k => s.stats[k] = Math.min(100, s.stats[k] + 7)) },
-                { id: 's7', cond: statSum >= 500, effect: () => {} }, 
-                { id: 's8', cond: s.donation >= 30000, effect: () => Object.keys(s.stats).forEach(k => s.stats[k] = Math.min(100, s.stats[k] + 5)) },
-                { id: 's9', cond: s.myTitles.length >= 7, effect: () => Object.keys(s.stats).forEach(k => s.stats[k] = Math.min(100, s.stats[k] + 5)) },
-                { id: 's10', cond: s.money >= 30000, effect: () => Object.keys(s.stats).forEach(k => s.stats[k] = Math.min(100, s.stats[k] + 5)) }
+                { id: 's1', cond: () => s.stats['체력'] >= 60, effect: () => s.stats['체력'] += 10 },
+                { id: 's2', cond: () => s.stats['지력'] >= 60, effect: () => s.stats['지력'] += 10 },
+                { id: 's3', cond: () => s.stats['창의성'] >= 60, effect: () => s.stats['창의성'] += 10 },
+                { id: 's4', cond: () => s.stats['정신력'] >= 60, effect: () => s.stats['정신력'] += 10 },
+                { id: 's5', cond: () => s.stats['인성'] >= 60, effect: () => s.stats['인성'] += 10 },
+                { id: 's6', cond: () => Object.values(s.stats).reduce((a, b) => a + b, 0) >= 350, effect: () => Object.keys(s.stats).forEach(k => s.stats[k] = Math.min(100, s.stats[k] + 7)) },
+                { id: 's7', cond: () => Object.values(s.stats).reduce((a, b) => a + b, 0) >= 500, effect: () => {} }, 
+                { id: 's8', cond: () => s.donation >= 30000, effect: () => Object.keys(s.stats).forEach(k => s.stats[k] = Math.min(100, s.stats[k] + 5)) },
+                { id: 's9', cond: () => s.myTitles.length >= 7, effect: () => Object.keys(s.stats).forEach(k => s.stats[k] = Math.min(100, s.stats[k] + 5)) },
+                { id: 's10', cond: () => s.money >= 30000, effect: () => Object.keys(s.stats).forEach(k => s.stats[k] = Math.min(100, s.stats[k] + 5)) }
             ]; 
+            
             conditions.forEach(c => {
                 const alreadyHas = s.myTitles.some(t => t.id === c.id);
-                if (c.cond && !alreadyHas) {
+                if (!alreadyHas && c.cond()) {
                     const titleInfo = defaultTitles.find(dt => dt.id === c.id);
                     if(titleInfo) {
                         s.myTitles.push(titleInfo); c.effect(); updated = true;
@@ -653,9 +1111,16 @@
                     }
                 }
             });
+            
             if (updated) {
                 Object.keys(s.stats).forEach(k => s.stats[k] = Math.min(100, s.stats[k]));
                 updateStudentDB(idx); 
+                
+                // 칭호가 획득되었다면 화면에 즉시 표시
+                if (currentIdx === idx && typeof updateUI === 'function') updateUI();
+                
+                // 하나의 칭호 효과가 또 다른 칭호의 조건을 충족시킬 수 있으므로 연쇄 확인
+                setTimeout(() => checkAutoTitles(idx), 100);
             }
         }
 
@@ -675,7 +1140,6 @@
             if(s.gender) checkEvolution(idx);
         } 
 
-        // 🚀 수정됨: 5강 -> 6강부터 능력치 300 제한 로직 적용
         function updateUI() { 
             const s = students[currentIdx]; 
             if(!s) return; 
@@ -686,9 +1150,8 @@
                 imgEl.src = s.characterImg; imgEl.style.display = 'block'; placeholderEl.style.display = 'none';
             } else { imgEl.style.display = 'none'; placeholderEl.style.display = 'block'; }
             document.getElementById('detailCharName').innerText = s.characterName || '캐릭터 미설정';
-            document.getElementById('detailCharTier').innerText = (s.characterStage && s.characterStage !== 99) ? `Tier ${s.characterStage}` : (s.characterStage === 99 ? '관리자' : 'Tier 0');
+            document.getElementById('detailCharTier').innerText = s.characterStage ? `Tier ${s.characterStage}` : 'Tier 0';
 
-            // 강화 UI 업데이트
             const enhanceSec = document.getElementById('enhanceSection');
             const enhanceBtn = document.getElementById('enhanceBtn');
             const nextInfo = document.getElementById('enhanceNextInfo');
@@ -708,8 +1171,11 @@
                 nextInfo.style.display = 'block';
                 const config = enhanceConfig[Lv]; 
                 
-                // [수정 사항] 5강 -> 6강(Lv 5일 때), 6강 -> 7강(Lv 6일 때)은 능력치 300 제한
-                const isStatLocked = (Lv >= 5 && statSum < 300);
+                let requiredStat = 0;
+                if (Lv >= 5) requiredStat = 300;
+                else if (Lv >= 3) requiredStat = 200;
+
+                const isStatLocked = (requiredStat > 0 && statSum < requiredStat);
                 
                 let rewardHtml = config.reward > 0 ? `<br>성공 시 보상: <span style="color:var(--green); font-weight:bold;">+${config.reward.toLocaleString()}원</span>` : '';
 
@@ -717,20 +1183,20 @@
                     강화 비용: <span style="color:#d35400; font-weight:bold;">${config.cost.toLocaleString()}원</span><br>
                     성공 확률: <span style="color:var(--main-blue); font-weight:bold;">${Math.round(config.prob * 100)}%</span><br>
                     성공 효과: 모든 능력 +${config.effect - currentEffect}${rewardHtml}<br>
-                    ${isStatLocked ? `<div style="color:var(--admin-red); font-weight:bold; margin-top:5px;">⚠️강화 조건: 능력치 300 이상</div>` : ''}
+                    ${isStatLocked ? `<div style="color:var(--admin-red); font-weight:bold; margin-top:5px;">⚠️강화 조건: 능력치 ${requiredStat} 이상</div>` : ''}
                 `;
 
                 enhanceBtn.innerText = `✨ ${Lv}강 ➔ ${Lv+1}강 강화 시도`;
                 
                 if (isStatLocked) {
                     enhanceBtn.disabled = true;
-                    enhanceBtn.innerText = "🔒 능력치 부족 (300 미만)";
+                    enhanceBtn.innerText = `🔒 능력치 부족 (${requiredStat} 미만)`;
                 } else {
                     enhanceBtn.disabled = false;
                 }
             }
 
-            document.getElementById('viewName').innerText = (currentIdx === 24) ? `🏫 ${s.name}` : `${s.num}번 ${s.name}`; 
+            document.getElementById('viewName').innerText = `${s.num}번 ${s.name}`; 
             document.getElementById('viewMoney').innerText = s.money.toLocaleString(); 
             document.getElementById('viewMyDonation').innerText = s.donation.toLocaleString(); 
             document.getElementById('myMedals').innerHTML = (s.myTitles || []).map(t => `<span title="${t.name}: ${t.effect}" style="font-size:25px; cursor:help;">${t.icon}</span>`).join(' '); 
@@ -752,7 +1218,6 @@
             document.getElementById('adminPanel').style.display = isAdmin ? 'block' : 'none'; 
         } 
 
-        // 🚀 수정됨: 실제 강화 함수에서도 능력치 300 체크 로직 추가
         function attemptEnhance() {
             const s = students[currentIdx];
             if (!s) return;
@@ -761,8 +1226,13 @@
             if (currentLv >= 7) return alert("이미 최고 단계입니다.");
 
             const statSum = Object.values(s.stats).reduce((a, b) => a + b, 0);
-            if (currentLv >= 5 && statSum < 300) {
-                return alert("강화 불가: 6강화부터는 총 능력치 합계가 300 이상이어야 합니다.");
+            
+            let requiredStat = 0;
+            if (currentLv >= 5) requiredStat = 300;
+            else if (currentLv >= 3) requiredStat = 200;
+
+            if (requiredStat > 0 && statSum < requiredStat) {
+                return alert(`강화 불가: ${currentLv+1}강화부터는 총 능력치 합계가 ${requiredStat} 이상이어야 합니다.`);
             }
 
             const config = enhanceConfig[currentLv];
@@ -805,21 +1275,51 @@
 
         function toggleAdmin() { 
             if (!isAdmin) { 
-                if (btoa(prompt("비밀번호를 입력하세요")) === ADMIN_TOKEN) isAdmin = true; 
+                if (prompt("선생님 비밀번호를 입력하세요") === currentAdminPw) isAdmin = true; 
                 else { alert("비밀번호가 틀렸습니다."); return; }
             } else isAdmin = false; 
             document.getElementById('mainAdminLoginBtn').innerText = isAdmin ? "🔓 로그아웃" : "🔒 관리자 로그인"; 
             document.getElementById('mainAdminLoginBtn').classList.toggle('active', isAdmin); 
-            document.getElementById('adminEvoPanel').style.display = isAdmin ? "block" : "none"; 
             document.getElementById('adminShopPanel').style.display = isAdmin ? "block" : "none"; 
             document.getElementById('adminQuizPanel').style.display = isAdmin ? "block" : "none"; 
+            document.getElementById('adminResetBtn').style.display = isAdmin ? "inline-block" : "none";
+            document.getElementById('adminDeleteClassBtn').style.display = isAdmin ? "inline-block" : "none";
+            
             renderGrid(); 
             if(isAdmin) { renderAdminShop(); renderAdminQuizList(); }
         } 
 
-        function updateStat(key, amt) { const s = students[currentIdx]; s.stats[key] = Math.max(0, Math.min(100, s.stats[key] + amt)); updateStudentDB(currentIdx); checkEvolution(currentIdx); } 
-        function updateMoney(dir) { const val = parseInt(document.getElementById('moneyInput').value); if(val) { students[currentIdx].money += (val * dir); updateStudentDB(currentIdx); } } 
-        function donateMoney() { const v = parseInt(prompt("기부할 금액")); if(v > 0 && students[currentIdx].money >= v) { students[currentIdx].money -= v; students[currentIdx].donation += v; updateStudentDB(currentIdx); checkAutoTitles(currentIdx); checkEvolution(currentIdx); } } 
+        // 🌟 돈/스탯이 변경되는 모든 관리자 및 사용자 액션에 checkAutoTitles 추가
+        function updateStat(key, amt) { 
+            const s = students[currentIdx]; 
+            s.stats[key] = Math.max(0, Math.min(100, s.stats[key] + amt)); 
+            updateStudentDB(currentIdx); 
+            checkAutoTitles(currentIdx); // 누락됐던 칭호 체크 추가
+            checkEvolution(currentIdx); 
+            updateUI(); // UI 즉시 반영
+        } 
+        
+        function updateMoney(dir) { 
+            const val = parseInt(document.getElementById('moneyInput').value); 
+            if(val) { 
+                students[currentIdx].money += (val * dir); 
+                updateStudentDB(currentIdx); 
+                checkAutoTitles(currentIdx); // 누락됐던 칭호 체크 추가
+                updateUI(); // UI 즉시 반영
+            } 
+        } 
+        
+        function donateMoney() { 
+            const v = parseInt(prompt("기부할 금액")); 
+            if(v > 0 && students[currentIdx].money >= v) { 
+                students[currentIdx].money -= v; 
+                students[currentIdx].donation += v; 
+                updateStudentDB(currentIdx); 
+                checkAutoTitles(currentIdx); 
+                checkEvolution(currentIdx); 
+                updateUI(); // UI 즉시 반영
+            } 
+        } 
 
         function showShop() { document.getElementById('detailPage').style.display='none'; document.getElementById('shopPage').style.display='block'; renderShopItems(); } 
         function closeShop() { document.getElementById('shopPage').style.display='none'; document.getElementById('detailPage').style.display='block'; } 
@@ -951,6 +1451,7 @@
             }); listDiv.innerHTML = html;
         }
 
+        // 🌟 퀴즈 정답 제출 시에도 checkAutoTitles 추가
         function submitQuiz(qId) {
             const student = students[currentIdx]; const quiz = quizData.find(q => q.id === qId); if(!quiz) return;
             let isCorrect = false;
@@ -962,10 +1463,15 @@
             } else {
                 const studentAnswer = document.getElementById(`ans_${qId}`).value.trim(); const formatStr = (str) => String(str).replace(/\s/g, '').toLowerCase(); isCorrect = (formatStr(studentAnswer) === formatStr(quiz.answer));
             }
+            
             if(isCorrect) {
                 if(quiz.rewardType === 'money') student.money += quiz.rewardAmt; else student.stats[quiz.rewardType] = Math.min(100, student.stats[quiz.rewardType] + quiz.rewardAmt);
                 student.solvedQuizzes.push(quiz.id); updateStudentDB(currentIdx);
-                alert(`🎉 정답입니다!`); renderStudentQuizList(); checkEvolution(currentIdx);
+                alert(`🎉 정답입니다!`); 
+                renderStudentQuizList(); 
+                checkAutoTitles(currentIdx); // 누락됐던 칭호 체크 추가
+                checkEvolution(currentIdx);
+                updateUI(); // UI 즉시 반영
             } else alert("❌ 틀렸습니다.");
         }
 
@@ -974,17 +1480,14 @@
         function editName(e, i) { e.stopPropagation(); const n = prompt("새 이름", students[i].name); if(n) { students[i].name = n; updateStudentDB(i); } } 
         function resetStudentPw() { const newPw = document.getElementById('newStudentPw').value; if(newPw) { students[currentIdx].pw = newPw; updateStudentDB(currentIdx); alert("변경됨"); } } 
         function resetIndividualData() {
-            if (!isAdmin) return; const s = students[currentIdx];
+            if (!isAdmin || !currentClassCode) return; const s = students[currentIdx];
             if (confirm(`[${s.name}] 학생 데이터를 초기화할까요?`)) {
                 s.money = 10000; s.donation = 0; s.stats = { "체력": 5, "지력": 5, "창의성": 5, "정신력": 5, "인성": 5 }; s.myTitles = []; s.solvedQuizzes = []; s.pw = null; s.gender = null; s.characterStage = 0; s.characterImg = null; s.characterName = null; s.enhanceLevel = 0; 
                 updateStudentDB(currentIdx); alert("해당 학생 데이터가 초기화되었습니다."); updateUI();
             }
         }
-        function resetAllData() { if(isAdmin && confirm("전체 초기화?") && prompt("삭제승인 입력") === "삭제승인") resetToDefault(); } 
         function editPrice(id) { if (!isAdmin) return; const inputEl = document.getElementById(`p-edit-${id}`); if (!inputEl) return; const newPrice = parseInt(inputEl.value); if (isNaN(newPrice) || newPrice < 0) return alert("올바른 가격을 입력해주세요."); let target = titleData.find(x => x.id === id) || potionData.find(x => x.id === id); if (target) { target.price = newPrice; updateShopDB(); alert(`수정 완료.`); renderAdminShop(); if(currentIdx !== null) renderShopItems(); } }
         function toggleItem(id) { if (!isAdmin) return; let target = titleData.find(x => x.id === id) || potionData.find(x => x.id === id); if (target) { target.onSale = !target.onSale; updateShopDB(); renderAdminShop(); if(currentIdx !== null) renderShopItems(); } }
-
-        initRealtimeSync(); 
     </script> 
 </body> 
 </html>
