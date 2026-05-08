@@ -17,7 +17,7 @@
         .landing-box:hover { border-color: var(--main-blue); transform: translateY(-5px); }
         .landing-input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #eee; border-radius: 10px; font-size: 1rem; box-sizing: border-box; outline: none; transition: 0.2s; }
         .landing-input:focus { border-color: var(--main-blue); }
-        
+
         /* 학급 생성 키 전용 스타일 */
         .master-pw-input { border-color: var(--admin-red); background-color: #fffaf0; }
         .master-pw-input:focus { border-color: #d35400; box-shadow: 0 0 5px rgba(231, 76, 60, 0.3); }
@@ -144,12 +144,11 @@
                 <h3 style="color:var(--admin-red); font-size:1.5rem; margin-top:0;">✨ 새로운 학급 생성</h3>
                 <p style="color:#666; font-size:0.95rem; margin-bottom:20px;">선생님을 위한 새로운 학급 공간을 만듭니다.</p>
                 
-                <!-- 학급 생성 키 추가 -->
-                <input type="password" id="createMasterPw" class="landing-input master-pw-input" placeholder="학급 생성용 마스터 키">
-                
+                <!-- 스마트 한글 패스워드 클래스(korean-pw) 적용 -->
+                <input type="password" id="createMasterPw" class="landing-input master-pw-input korean-pw" placeholder="학급 생성용 마스터 키">
                 <input type="text" id="createClassName" class="landing-input" placeholder="학급 이름 (예: 6학년 5반)">
-                <input type="password" id="createAdminPw" class="landing-input" placeholder="선생님 비밀번호 (관리자용 설정)">
-                <input type="password" id="createAdminPwConfirm" class="landing-input" placeholder="선생님 비밀번호 확인">
+                <input type="password" id="createAdminPw" class="landing-input korean-pw" placeholder="선생님 비밀번호 (관리자용 설정)">
+                <input type="password" id="createAdminPwConfirm" class="landing-input korean-pw" placeholder="선생님 비밀번호 확인">
                 <button class="btn btn-lg" style="background:var(--admin-red); color:white;" onclick="createClass()">학급 생성하기</button>
             </div>
         </div>
@@ -178,7 +177,7 @@
             </div>
             <div class="setup-input-group">
                 <label id="findLabel2">🔑 선생님 비밀번호</label>
-                <input type="password" id="findInput2" placeholder="관리자용 설정 비밀번호">
+                <input type="password" id="findInput2" class="korean-pw" placeholder="관리자용 설정 비밀번호">
             </div>
             
             <div style="display:flex; gap:10px; margin-top:20px;">
@@ -244,7 +243,7 @@
             <p style="color:#555; font-size:0.95rem;">모험을 시작할 캐릭터의 성별을 선택하세요.</p>
             <div class="setup-input-group">
                 <label>🔐 나만의 비밀번호 설정</label>
-                <input type="text" id="setupPw" placeholder="기억하기 쉬운 비밀번호 입력">
+                <input type="password" id="setupPw" class="korean-pw" placeholder="기억하기 쉬운 비밀번호 입력">
             </div>
             <div class="setup-input-group">
                 <label>👤 캐릭터 성별 선택</label>
@@ -411,7 +410,7 @@
                     </div>
                     <div id="adminStatControls"></div> 
                     <div style="margin-top:15px;"><strong style="color:var(--admin-red)">🔑 비번 관리</strong><br> 
-                        <input type="text" id="newStudentPw" style="width:120px; padding:5px;" placeholder="새 비밀번호"> 
+                        <input type="password" id="newStudentPw" class="korean-pw" style="width:120px; padding:5px;" placeholder="새 비밀번호"> 
                         <button class="btn" style="background:var(--dark); color:white; padding:5px 10px;" onclick="resetStudentPw()">재설정</button> 
                     </div>
                     <div style="margin-top:20px; padding-top:10px; border-top:1px dashed #ffcfcf;">
@@ -440,10 +439,24 @@
     <!-- 공통 푸터 -->
     <div class="site-footer">
         Copyright © 2026 KEUNHO SHIN. All rights reserved.<br>
-        For God so loved the world, that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life. [JOHN 3:16]
+        For God so loved the world, that he gave his one and only Son, that whoever believes in him 초shall not perish but have eternal life. [JOHN 3:16]
     </div>
 
     <script> 
+        // 🌟 한글 비밀번호 입력을 위한 스마트 마스킹 처리 
+        // 입력할 때(focus)는 일반 텍스트 모드로 전환되어 한글이 완벽히 입력되고,
+        // 입력을 마치고 밖을 클릭(blur)하면 다시 비밀번호 모드(***)로 가려집니다.
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.korean-pw').forEach(input => {
+                input.addEventListener('focus', () => {
+                    input.type = 'text';
+                });
+                input.addEventListener('blur', () => {
+                    input.type = 'password';
+                });
+            });
+        });
+
         // 1. Firebase 설정
         const firebaseConfig = { 
             apiKey: "AIzaSyBxZ9j03f982mny1wpotzfjkR81onkpSXY", 
@@ -481,7 +494,7 @@
         let customEvoImages = {}; 
         let noticeText = ""; 
         let tempQuizImageBase64 = ""; 
-        let showRanking = true; // 🌟 추가: 순위표 표시 여부
+        let showRanking = true; 
 
         // 🌟 전역 마스터 키 실시간 로드
         db.ref('globalConfig/masterKey').on('value', (snapshot) => {
@@ -623,7 +636,8 @@
                     for (let code in data) {
                         const cls = data[code];
                         if (role === 'teacher') {
-                            if (cls.className === val1 && cls.adminPw === val2) {
+                            // 🌟 띄어쓰기로 인한 오류 방지 처리 추가
+                            if (cls.className.replace(/\s+/g, '') === val1.replace(/\s+/g, '') && cls.adminPw === val2) {
                                 foundCode = code;
                                 break;
                             }
@@ -631,7 +645,8 @@
                             // 학생 검색 모드: 해당 학급의 학생 목록을 순회
                             if (cls.students) {
                                 const studentList = Object.values(cls.students);
-                                const foundStudent = studentList.find(s => s && s.name === val1 && s.pw === val2);
+                                // 🌟 학생 이름 검색 시에도 띄어쓰기 무시 처리 추가
+                                const foundStudent = studentList.find(s => s && s.name.replace(/\s+/g, '') === val1.replace(/\s+/g, '') && s.pw === val2);
                                 if (foundStudent) {
                                     foundCode = code;
                                     break;
@@ -759,7 +774,7 @@
                 adminPw: adminPw,
                 students: [], 
                 noticeText: "반갑습니다! 공지사항을 입력하세요.",
-                showRanking: true, // 🌟 생성 시 순위 표시를 켬
+                showRanking: true, 
                 titleData: defaultTitles,
                 potionData: defaultPotions,
                 quizData: []
@@ -813,7 +828,6 @@
                     titleData = data.titleData || defaultTitles;
                     potionData = data.potionData || defaultPotions;
                     
-                    // 🌟 순위표 토글 동기화
                     showRanking = data.showRanking !== false; // 기본값 true 설정
                     document.getElementById('rankingSidePanel').style.display = showRanking ? 'block' : 'none';
                     const toggleBtn = document.getElementById('adminToggleRankingBtn');
@@ -838,8 +852,6 @@
                 }
             });
         }
-
-        // ----------------------------------------
 
         function applyCustomEvoImages() {
             for(let g in evolutionData) {
@@ -1097,15 +1109,13 @@
             document.getElementById('donationRankList').innerHTML = donHtml; 
         } 
 
-        // 🌟 수정된 자동 칭호 확인 로직
         function checkAutoTitles(idx) {
             const s = students[idx];
             if (!s) return;
-            if (!s.myTitles) s.myTitles = []; // Firebase 빈 배열 소실 방지 처리
+            if (!s.myTitles) s.myTitles = []; 
             
             let updated = false;
             
-            // cond 속성을 즉시 평가(boolean)에서 지연 평가(함수)로 변경하여 항상 최신 스탯을 읽어옵니다.
             const conditions = [
                 { id: 's1', cond: () => s.stats['체력'] >= 60, effect: () => s.stats['체력'] += 10 },
                 { id: 's2', cond: () => s.stats['지력'] >= 60, effect: () => s.stats['지력'] += 10 },
@@ -1134,10 +1144,8 @@
                 Object.keys(s.stats).forEach(k => s.stats[k] = Math.min(100, s.stats[k]));
                 updateStudentDB(idx); 
                 
-                // 칭호가 획득되었다면 화면에 즉시 표시
                 if (currentIdx === idx && typeof updateUI === 'function') updateUI();
                 
-                // 하나의 칭호 효과가 또 다른 칭호의 조건을 충족시킬 수 있으므로 연쇄 확인
                 setTimeout(() => checkAutoTitles(idx), 100);
             }
         }
@@ -1302,20 +1310,19 @@
             document.getElementById('adminQuizPanel').style.display = isAdmin ? "block" : "none"; 
             document.getElementById('adminResetBtn').style.display = isAdmin ? "inline-block" : "none";
             document.getElementById('adminDeleteClassBtn').style.display = isAdmin ? "inline-block" : "none";
-            document.getElementById('adminToggleRankingBtn').style.display = isAdmin ? "inline-block" : "none"; // 🌟 추가
+            document.getElementById('adminToggleRankingBtn').style.display = isAdmin ? "inline-block" : "none"; 
             
             renderGrid(); 
             if(isAdmin) { renderAdminShop(); renderAdminQuizList(); }
         } 
 
-        // 🌟 돈/스탯이 변경되는 모든 관리자 및 사용자 액션에 checkAutoTitles 추가
         function updateStat(key, amt) { 
             const s = students[currentIdx]; 
             s.stats[key] = Math.max(0, Math.min(100, s.stats[key] + amt)); 
             updateStudentDB(currentIdx); 
-            checkAutoTitles(currentIdx); // 누락됐던 칭호 체크 추가
+            checkAutoTitles(currentIdx); 
             checkEvolution(currentIdx); 
-            updateUI(); // UI 즉시 반영
+            updateUI(); 
         } 
         
         function updateMoney(dir) { 
@@ -1323,8 +1330,8 @@
             if(val) { 
                 students[currentIdx].money += (val * dir); 
                 updateStudentDB(currentIdx); 
-                checkAutoTitles(currentIdx); // 누락됐던 칭호 체크 추가
-                updateUI(); // UI 즉시 반영
+                checkAutoTitles(currentIdx); 
+                updateUI(); 
             } 
         } 
         
@@ -1336,7 +1343,7 @@
                 updateStudentDB(currentIdx); 
                 checkAutoTitles(currentIdx); 
                 checkEvolution(currentIdx); 
-                updateUI(); // UI 즉시 반영
+                updateUI(); 
             } 
         } 
 
@@ -1470,7 +1477,6 @@
             }); listDiv.innerHTML = html;
         }
 
-        // 🌟 퀴즈 정답 제출 시에도 checkAutoTitles 추가
         function submitQuiz(qId) {
             const student = students[currentIdx]; const quiz = quizData.find(q => q.id === qId); if(!quiz) return;
             let isCorrect = false;
@@ -1488,9 +1494,9 @@
                 student.solvedQuizzes.push(quiz.id); updateStudentDB(currentIdx);
                 alert(`🎉 정답입니다!`); 
                 renderStudentQuizList(); 
-                checkAutoTitles(currentIdx); // 누락됐던 칭호 체크 추가
+                checkAutoTitles(currentIdx);
                 checkEvolution(currentIdx);
-                updateUI(); // UI 즉시 반영
+                updateUI(); 
             } else alert("❌ 틀렸습니다.");
         }
 
