@@ -38,7 +38,7 @@
         .total-donation-box { font-size: 1.4rem; color: var(--green); font-weight: bold; margin-bottom: 15px; } 
         .admin-top-group { position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 8px; } 
         .join-code-badge { background: #eef5ff; color: var(--main-blue); padding: 4px 10px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; border: 1px solid #d0e3ff; }
-        #mainAdminLoginBtn, #adminResetBtn, #adminDeleteClassBtn { background: #eee; color: #888; border: 1px solid #ddd; padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 10px; transition: 0.2s; } 
+        #mainAdminLoginBtn, #adminToggleRankingBtn, #adminResetBtn, #adminDeleteClassBtn { background: #eee; color: #888; border: 1px solid #ddd; padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 10px; transition: 0.2s; } 
         #mainAdminLoginBtn.active { background: var(--admin-red); color: white; border: none; } 
         #adminDeleteClassBtn { color: var(--admin-red); font-weight: bold; }
         #adminDeleteClassBtn:hover { background: var(--admin-red); color: white; }
@@ -275,6 +275,7 @@
                     <div class="admin-top-group"> 
                         <span class="join-code-badge" title="이 코드를 학생들에게 공유하세요">참여 코드: <span id="displayJoinCode"></span></span>
                         <button id="mainAdminLoginBtn" onclick="toggleAdmin()">🔒 관리자 로그인</button> 
+                        <button id="adminToggleRankingBtn" onclick="toggleRanking()" style="display:none;">🏆 순위 숨기기</button>
                         <button id="adminResetBtn" onclick="resetToDefault()" style="display:none;">⚠️ 현재 학급 초기화</button> 
                         <button id="adminDeleteClassBtn" onclick="deleteCurrentClass()" style="display:none;">🗑️ 학급 삭제하기</button>
                     </div> 
@@ -351,7 +352,7 @@
                 </div>
             </div> 
             
-            <div class="ranking-side"> 
+            <div class="ranking-side" id="rankingSidePanel"> 
                 <div class="ranking-section"> 
                     <div class="ranking-title">🏆 능력치 TOP 10</div> 
                     <div id="statRankList"></div> 
@@ -480,6 +481,7 @@
         let customEvoImages = {}; 
         let noticeText = ""; 
         let tempQuizImageBase64 = ""; 
+        let showRanking = true; // 🌟 추가: 순위표 표시 여부
 
         // 🌟 전역 마스터 키 실시간 로드
         db.ref('globalConfig/masterKey').on('value', (snapshot) => {
@@ -558,6 +560,15 @@
         function updateShopDB() { if (!db || !currentClassCode) return; db.ref(`classes/${currentClassCode}`).update({ titleData: titleData, potionData: potionData }); }
         function updateQuizDB() { if (!db || !currentClassCode) return; db.ref(`classes/${currentClassCode}`).update({ quizData: quizData }); }
         function saveNotice() { if (!db || !isAdmin || !currentClassCode) return; const noticeVal = document.getElementById('noticeContent').innerText; db.ref(`classes/${currentClassCode}`).update({ noticeText: noticeVal }); alert("✅ 저장되었습니다."); }
+
+        // --- 🚀 순위표 토글 추가 로직 ---
+        function toggleRanking() {
+            if (!isAdmin || !currentClassCode) return;
+            const newState = !showRanking;
+            db.ref(`classes/${currentClassCode}`).update({ showRanking: newState }).then(() => {
+                alert(newState ? "학생들에게 순위가 보이도록 설정했습니다." : "학생들에게 순위를 숨김 처리했습니다.");
+            });
+        }
 
         // --- 🚀 코드 찾기 로직 ---
         function toggleFindRole() {
@@ -748,6 +759,7 @@
                 adminPw: adminPw,
                 students: [], 
                 noticeText: "반갑습니다! 공지사항을 입력하세요.",
+                showRanking: true, // 🌟 생성 시 순위 표시를 켬
                 titleData: defaultTitles,
                 potionData: defaultPotions,
                 quizData: []
@@ -800,6 +812,12 @@
                     quizData = data.quizData || [];
                     titleData = data.titleData || defaultTitles;
                     potionData = data.potionData || defaultPotions;
+                    
+                    // 🌟 순위표 토글 동기화
+                    showRanking = data.showRanking !== false; // 기본값 true 설정
+                    document.getElementById('rankingSidePanel').style.display = showRanking ? 'block' : 'none';
+                    const toggleBtn = document.getElementById('adminToggleRankingBtn');
+                    if(toggleBtn) toggleBtn.innerText = showRanking ? "🏆 순위 숨기기" : "🏆 순위 보이기";
 
                     applyCustomEvoImages(); 
 
@@ -859,7 +877,7 @@
                 if (prompt("삭제승인 입력") === "삭제승인") {
                     students = []; 
                     db.ref(`classes/${currentClassCode}`).update({
-                        students: students, noticeText: "반갑습니다!", titleData: defaultTitles, potionData: defaultPotions, quizData: []
+                        students: students, noticeText: "반갑습니다!", titleData: defaultTitles, potionData: defaultPotions, quizData: [], showRanking: true
                     });
                     alert("현재 학급 초기화가 완료되었습니다.");
                 }
@@ -1284,6 +1302,7 @@
             document.getElementById('adminQuizPanel').style.display = isAdmin ? "block" : "none"; 
             document.getElementById('adminResetBtn').style.display = isAdmin ? "inline-block" : "none";
             document.getElementById('adminDeleteClassBtn').style.display = isAdmin ? "inline-block" : "none";
+            document.getElementById('adminToggleRankingBtn').style.display = isAdmin ? "inline-block" : "none"; // 🌟 추가
             
             renderGrid(); 
             if(isAdmin) { renderAdminShop(); renderAdminQuizList(); }
