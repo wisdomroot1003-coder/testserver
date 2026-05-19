@@ -163,7 +163,7 @@
             <!-- 학급 생성 (선생님용) -->
             <div class="landing-box">
                 <h3 style="color:var(--admin-red); font-size:1.5rem; margin-top:0;">✨ 새로운 학급 생성</h3>
-                <p style="color:#666; font-size:0.95rem; margin-bottom:20px;">선생님을 위한 새로운 학급 공간을 만듭니다.</p>
+                <p style="color:#666; font-size:0.95rem; margin-bottom:20px;">선생님이 사용할 새로운 학급 공간을 만듭니다.</p>
                 
                 <!-- 스마트 한글 패스워드 클래스(korean-pw) 적용 -->
                 <input type="password" id="createMasterPw" class="landing-input master-pw-input korean-pw" placeholder="학급 생성용 마스터 키">
@@ -314,7 +314,7 @@
     <div id="petModal" class="modal-overlay">
         <div class="modal-content">
             <h2 style="color:#27ae60; margin-top:0;">🐾 전설의 동물 </h2>
-            <p style="color:#666; font-size:0.95rem;">원하는 알을 선택하여 동물을 부화시키세요!<br>(비용: <span id="petModalCost" style="color:var(--admin-red); font-weight:bold;"></span>원)</p>
+            <p style="color:#666; font-size:0.95rem;">원하는 알을 선택하여 동물을 데려오세요!<br>(비용: <span id="petModalCost" style="color:var(--admin-red); font-weight:bold;"></span>원)</p>
             <div class="evo-grid" id="petModalGrid"></div>
             <button class="btn" style="background:#ccc; margin-top:15px; width:100px;" onclick="document.getElementById('petModal').style.display='none'">취소</button>
         </div>
@@ -482,6 +482,9 @@
                         <button class="btn" style="background:var(--admin-red); color:white;" onclick="updateMoney(-1)">차감</button> 
                     </div>
                     
+                    <!-- 🐾 전설의 동물 친밀도 관리 패널 추가 -->
+                    <div id="adminPetControls" style="margin-bottom:15px; border-bottom: 1px dashed #ffcfcf; padding-bottom:15px;"></div>
+                    
                     <div id="adminStatControls"></div> 
                     <div style="margin-top:15px;"><strong style="color:var(--admin-red)">🔑 비번 관리</strong><br> 
                         <input type="password" id="newStudentPw" class="korean-pw" style="width:120px; padding:5px;" placeholder="새 비밀번호"> 
@@ -539,6 +542,7 @@
             messagingSenderId: "997945940198", 
             appId: "1:997945940198:web:b2c5687575c23fb5cb8327", 
         }; 
+
         
         firebase.initializeApp(firebaseConfig); 
         const db = firebase.database(); 
@@ -1077,7 +1081,7 @@
                 myTitles: [], solvedQuizzes: [], pets: [],
                 pw: null, gender: null, characterStage: 0, characterImg: null, characterName: null,
                 enhanceLevel: 0,
-                lastPetRewardWeek: "" // 🌟 펫 보상 확인용 상태
+                lastPetRewardWeek: "" // 🌟 전설의 동물 보상 확인용 상태
             };
             students.push(newStudent);
             db.ref(`classes/${currentClassCode}/students`).set(students).then(() => {
@@ -1389,6 +1393,24 @@
             if(s.gender) checkEvolution(idx);
         } 
 
+        // 🌟 관리자가 전설의 동물 친밀도 강제 조정
+        function updatePetAffinityAdmin(pIdx, amt) {
+            const s = students[currentIdx];
+            if (!s || !s.pets || !s.pets[pIdx]) return;
+            
+            const p = s.pets[pIdx];
+            p.affinity = Math.max(0, Math.min(100, p.affinity + amt));
+            
+            const newStage = getPetStage(p.affinity);
+            if (newStage !== p.stage) {
+                p.stage = newStage;
+            }
+            
+            updateStudentDB(currentIdx);
+            updateUI();
+            renderGrid();
+        }
+
         function updateUI() { 
             const s = students[currentIdx]; 
             if(!s) return; 
@@ -1464,6 +1486,27 @@
             document.getElementById('viewStatSum').innerText = statSum;
             document.getElementById('statList').innerHTML = h; 
             document.getElementById('adminStatControls').innerHTML = adminH; 
+
+            // 🌟 전설의 동물 관리자 컨트롤 추가
+            let adminPetH = `<strong style="color:#27ae60">🐾 전설의 동물 친밀도 관리</strong><br>`;
+            if(s.pets && s.pets.length > 0) {
+                s.pets.forEach((p, i) => {
+                    let specificName = petNames[p.type] ? petNames[p.type][p.stage] : p.type;
+                    adminPetH += `<div style="margin-top:5px; font-size:13px; display:flex; align-items:center; justify-content:space-between;"> 
+                        <span>${specificName} (${p.affinity}%)</span> 
+                        <div>
+                            <button class="stat-admin-btn" onclick="updatePetAffinityAdmin(${i}, 10)">+10</button>
+                            <button class="stat-admin-btn" onclick="updatePetAffinityAdmin(${i}, 1)">+1</button>
+                            <button class="stat-admin-btn" onclick="updatePetAffinityAdmin(${i}, -1)">-1</button>
+                            <button class="stat-admin-btn" onclick="updatePetAffinityAdmin(${i}, -10)">-10</button>
+                        </div> 
+                    </div>`;
+                });
+            } else {
+                adminPetH += `<div style="margin-top:5px; font-size:12px; color:#888;">보유한 동물이 없습니다.</div>`;
+            }
+            document.getElementById('adminPetControls').innerHTML = adminPetH;
+
             document.getElementById('adminPanel').style.display = isAdmin ? 'block' : 'none'; 
 
             renderPetSection();
@@ -1480,7 +1523,7 @@
             
             const list = document.getElementById('petList');
             if(s.pets.length === 0) {
-                list.innerHTML = `<div style="text-align:center; color:#888; font-size:0.9rem;">아직 부화시킨 동물이 없습니다.<br>알을 부화시켜 매주 능력 보상을 받으세요!</div>`;
+                list.innerHTML = `<div style="text-align:center; color:#888; font-size:0.9rem;">아직 부화시킨 동물이 없습니다.<br>알을 부화시켜 매주 보상을 받으세요!</div>`;
                 return;
             }
             
@@ -1530,7 +1573,7 @@
             if(s.pets.length >= 2) return alert("전설의 동물은 최대 2마리까지만 기를 수 있습니다.");
             
             const cost = s.pets.length === 0 ? 5000 : 10000;
-            if(s.money < cost) return alert(`비용이 부족합니다. ( 비용: ${cost.toLocaleString()}원)`);
+            if(s.money < cost) return alert(`비용이 부족합니다. (비용: ${cost.toLocaleString()}원)`);
             
             document.getElementById('petModalCost').innerText = cost.toLocaleString();
             
@@ -1554,7 +1597,7 @@
             const s = students[currentIdx];
             if(s.pets.some(p => p.type === typeStr)) return alert("이미 기르고 있는 종류입니다. 다른 알을 선택하세요.");
             
-            if(confirm(`[${petNames[typeStr][1]}](을)를 ${cost.toLocaleString()}원을 지불하고 데려오겠습니까?`)) {
+            if(confirm(`[${petNames[typeStr][1]}](을)를 ${cost.toLocaleString()}원에 구매하여 데려오겠습니까?`)) {
                 s.money -= cost;
                 s.pets.push({ type: typeStr, affinity: 0, stage: 1 });
                 updateStudentDB(currentIdx);
