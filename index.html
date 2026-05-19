@@ -28,11 +28,13 @@
         .ranking-section { margin-bottom: 25px; } 
         .ranking-title { font-weight: bold; color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 8px; margin-bottom: 10px; text-align: center; font-size: 1rem; } 
         .ranking-title.donation { color: var(--green); border-bottom-color: #d3f9d8; } 
+        .ranking-title.pet-affinity { color: #d35400; border-bottom-color: #fdebd0; } 
         .rank-item { display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.85rem; line-height: 1.2; } 
         .rank-num { width: 25px; font-weight: 800; color: #888; font-size: 0.8rem; } 
         .rank-name { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 5px; } 
         .rank-score { font-weight: bold; color: var(--purple); font-size: 0.8rem; } 
         .rank-score.don { color: var(--green); } 
+        .rank-score.pet { color: #d35400; } 
         .rank-1 .rank-num { color: #d4af37; } 
         .header-stats { background: white; padding: 25px; border-radius: 20px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; } 
         .total-donation-box { font-size: 1.4rem; color: var(--green); font-weight: bold; margin-bottom: 15px; } 
@@ -52,9 +54,16 @@
         .student-card { background: white; padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s; border: 1px solid #eee; position: relative; min-height: 280px; display: flex; flex-direction: column; justify-content: flex-start; } 
         .student-card:hover { border-color: var(--main-blue); box-shadow: 0 8px 15px rgba(0,0,0,0.1); transform: translateY(-3px); } 
         .gold-card { border: 3px solid var(--gold) !important; background: #fffdf5 !important; box-shadow: 0 0 15px rgba(241, 196, 15, 0.2); } 
-        .char-img-container { width: 100px; height: 100px; margin: 10px auto 10px auto; border-radius: 50%; overflow: hidden; border: 3px solid #eee; background: #fafafa; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
-        .char-img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .char-img-container { position: relative; width: 100px; height: 100px; margin: 10px auto 5px auto; border-radius: 50%; border: 3px solid #eee; background: #fafafa; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        .char-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
         .char-placeholder { font-size: 3rem; opacity: 0.2; }
+        
+        /* 🐾 전설의 동물 게이지 및 아이콘 */
+        .pet-mini-container { display: flex; justify-content: center; gap: 8px; margin-top: -10px; margin-bottom: 8px; position: relative; z-index: 2; }
+        .pet-mini-wrapper { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+        .pet-mini-icon { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; background: #fffdf5; object-fit: cover; }
+
         .card-enhance-stars { color: var(--gold); font-size: 1.1rem; height: 1.2rem; margin-top: 2px; margin-bottom: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .card-titles { margin: 5px 0; min-height: 25px; display: flex; justify-content: center; flex-wrap: wrap; gap: 3px; } 
         .card-money { font-size: 0.95rem; color: #d35400; font-weight: bold; margin-bottom: 5px; } 
@@ -104,6 +113,18 @@
         .enhance-btn { width: 100%; background: var(--gold); color: #856404; font-weight: bold; border: 1px solid #b58900; margin-top: 10px; font-size: 1rem; text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
         .enhance-btn:hover { background: #f39c12; }
         .enhance-btn:disabled { background: #bdc3c7; border-color: #95a5a6; color: #7f8c8d; cursor: not-allowed; text-shadow: none; }
+        
+        /* 🐾 전설의 동물 디테일 뷰 스타일 */
+        .pet-panel { background: #f4fcf6; border: 2px solid #2ecc71; border-radius: 15px; padding: 15px; margin-top: 20px; }
+        .pet-panel-title { font-weight: bold; color: #27ae60; font-size: 1.2rem; margin-bottom: 10px; border-bottom: 2px solid #c8e6c9; padding-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .pet-list { display: flex; flex-direction: column; gap: 10px; }
+        .pet-card-detail { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 10px; border: 1px solid #e0e0e0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .pet-card-img-wrapper { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .pet-card-img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #fff; object-fit: cover; background: #fffdf5; }
+        .pet-card-info { flex: 1; text-align: left; }
+        .pet-affinity-bar { height: 10px; background: #eee; border-radius: 5px; overflow: hidden; margin-top: 5px; }
+        .pet-affinity-fill { height: 100%; background: #e74c3c; width: 0%; transition: 0.3s; }
+
         .quiz-card { border: 2px solid var(--main-blue); border-radius: 15px; padding: 20px; margin-bottom: 20px; background: #fdfdff; }
         .quiz-card img { max-width: 100%; max-height: 300px; border-radius: 8px; margin: 10px 0; border: 1px solid #ddd; }
         .quiz-question { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; color: var(--dark); }
@@ -205,9 +226,9 @@
             </div>
         </div>
 
-        <!-- 전역 진화 일러스트 관리 패널 (학급에서 이동됨) -->
+        <!-- 전역 진화 일러스트 관리 패널 -->
         <div style="background:#fffdf5; border:2px solid var(--gold); padding:20px; border-radius:15px; margin-bottom:25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-            <h3 style="color:#b58900; margin-top:0;">🖼️ 전역 진화 일러스트(URL) 관리</h3>
+            <h3 style="color:#b58900; margin-top:0;">🖼️ 전역 캐릭터 진화 일러스트(URL) 관리</h3>
             <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">이곳에서 등록한 일러스트는 <b>모든 생성된 학급</b>에 공통으로 적용됩니다.</p>
             <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
                 <select id="evoGenInput">
@@ -229,6 +250,29 @@
                 </select>
                 <input type="text" id="evoUrlInput" placeholder="https://... (이미지 주소 복사 붙여넣기)" style="flex:1; min-width:200px; padding:8px; border-radius:5px; border:1px solid #ccc; outline:none;">
                 <button class="btn" style="background:var(--gold); color:#856404; border:1px solid #b58900;" onclick="saveEvoImage()">전역 서버에 적용</button>
+            </div>
+        </div>
+
+        <!-- 🐾 전설의 동물 전역 일러스트 관리 패널 -->
+        <div style="background:#f4fcf6; border:2px solid #2ecc71; padding:20px; border-radius:15px; margin-bottom:25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <h3 style="color:#27ae60; margin-top:0;">🐾 전설의 동물 일러스트(URL) 관리</h3>
+            <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">전설의 동물 종류와 진화 단계에 따른 공통 이미지를 설정합니다.</p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                <select id="petTypeInput">
+                    <option value="유니콘">유니콘 (흰색)</option>
+                    <option value="피닉스">피닉스 (붉은색)</option>
+                    <option value="청룡">청룡 (푸른색)</option>
+                    <option value="현무">현무 (초록색)</option>
+                    <option value="구미호">구미호 (주황색)</option>
+                </select>
+                <select id="petStageInput">
+                    <option value="1">1단계 알 (친밀도 0~10)</option>
+                    <option value="2">2단계 새끼 (친밀도 11~30)</option>
+                    <option value="3">3단계 성체 (친밀도 31~70)</option>
+                    <option value="4">4단계 전설 (친밀도 71~100)</option>
+                </select>
+                <input type="text" id="petUrlInput" placeholder="https://... (이미지 주소 복사 붙여넣기)" style="flex:1; min-width:200px; padding:8px; border-radius:5px; border:1px solid #ccc; outline:none;">
+                <button class="btn" style="background:#2ecc71; color:white; border:1px solid #27ae60;" onclick="savePetImage()">동물 이미지 적용</button>
             </div>
         </div>
 
@@ -263,6 +307,16 @@
             <h2 id="evoTitle" style="color:var(--gold); margin-top:0; text-shadow: 0 2px 2px rgba(0,0,0,0.1);">캐릭터 진화!</h2>
             <p id="evoDesc" style="color:#666; font-size:0.95rem;">능력치가 성장하여 새로운 직업으로 전직합니다!</p>
             <div class="evo-grid" id="evoGrid"></div>
+        </div>
+    </div>
+    
+    <!-- 🐾 전설의 동물 선택 모달 -->
+    <div id="petModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="color:#27ae60; margin-top:0;">🐾 전설의 동물 </h2>
+            <p style="color:#666; font-size:0.95rem;">원하는 알을 선택하여 동물을 부화시키세요!<br>(비용: <span id="petModalCost" style="color:var(--admin-red); font-weight:bold;"></span>원)</p>
+            <div class="evo-grid" id="petModalGrid"></div>
+            <button class="btn" style="background:#ccc; margin-top:15px; width:100px;" onclick="document.getElementById('petModal').style.display='none'">취소</button>
         </div>
     </div>
 
@@ -360,6 +414,11 @@
                     <div class="ranking-title donation">🕊️ 기부천사 TOP 10</div> 
                     <div id="donationRankList"></div> 
                 </div> 
+                <!-- 🌟 전설의 동물 친밀도 랭킹 추가 -->
+                <div class="ranking-section"> 
+                    <div class="ranking-title pet-affinity">🐾 전설의 동물 친밀도 TOP 10</div> 
+                    <div id="petRankList"></div> 
+                </div> 
             </div> 
         </div> 
     </div> 
@@ -402,12 +461,27 @@
                 <hr style="border:0; height:1px; background:#eee; margin:20px 0;"> 
                 <h3>📊 능력치 (합계: <span id="viewStatSum">0</span>)</h3> 
                 <div id="statList"></div> 
+
+                <!-- 🐾 전설의 동물 UI -->
+                <div id="petSection" class="pet-panel">
+                    <div class="pet-panel-title">
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <span>🐾 나의 전설의 동물</span>
+                            <span style="font-size: 0.75rem; color: #666; font-weight: normal;">다음 주간 보상까지: <span id="petRewardTimer" style="color:var(--admin-red); font-weight:bold;">계산 중...</span></span>
+                        </div>
+                        <button class="btn" style="background:#27ae60; color:white; padding: 4px 10px; font-size: 0.9rem;" onclick="unlockPet()" id="petUnlockBtn">데려오기</button>
+                    </div>
+                    <div id="petList" class="pet-list"></div>
+                </div>
+
+                <!-- 관리자 패널 -->
                 <div id="adminPanel" style="display:none; background:#fff5f5; padding:15px; border-radius:10px; margin-top:20px; border: 1px solid #ffcfcf;"> 
                     <div style="margin-bottom:15px;"><strong style="color:var(--admin-red)">🛠 돈 조정</strong><br> 
                         <input type="number" id="moneyInput" style="width:80px; padding:5px;"> 원 
                         <button class="btn btn-blue" onclick="updateMoney(1)">지급</button> 
                         <button class="btn" style="background:var(--admin-red); color:white;" onclick="updateMoney(-1)">차감</button> 
                     </div>
+                    
                     <div id="adminStatControls"></div> 
                     <div style="margin-top:15px;"><strong style="color:var(--admin-red)">🔑 비번 관리</strong><br> 
                         <input type="password" id="newStudentPw" class="korean-pw" style="width:120px; padding:5px;" placeholder="새 비밀번호"> 
@@ -444,8 +518,6 @@
 
     <script> 
         // 🌟 한글 비밀번호 입력을 위한 스마트 마스킹 처리 
-        // 입력할 때(focus)는 일반 텍스트 모드로 전환되어 한글이 완벽히 입력되고,
-        // 입력을 마치고 밖을 클릭(blur)하면 다시 비밀번호 모드(***)로 가려집니다.
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.korean-pw').forEach(input => {
                 input.addEventListener('focus', () => {
@@ -473,14 +545,9 @@
 
         // 2. 변수 및 데이터 설정
         let isAdmin = false; 
-        
-        // 개발자 모드 전용 암호화 토큰 (Base64 인코딩: rootwisdomlove)
         const DEV_TOKEN = "cm9vdHdpc2RvbWxvdmU=";
-        
-        // 동적 마스터 키 설정 (기본값 설정용 변수)
         let dynamicMasterKey = "class1234";
 
-        // 다중 학급 지원을 위한 글로벌 변수
         let currentClassCode = null;
         let currentClassName = "";
         let currentAdminPw = "";
@@ -492,9 +559,65 @@
         let potionData = []; 
         let quizData = []; 
         let customEvoImages = {}; 
+        let customPetImages = {};
         let noticeText = ""; 
         let tempQuizImageBase64 = ""; 
         let showRanking = true; 
+        let snackPrice = 300;
+
+        // 🌟 서버 시간 동기화 기반 주차계산용 오프셋
+        let serverTimeOffset = 0;
+        db.ref(".info/serverTimeOffset").on("value", function(snap) {
+          serverTimeOffset = snap.val() || 0;
+        });
+
+        function getCurrentWeekId() {
+            // Firebase 서버 시간 기준 월요일 시작 주차 반환 (ex: 2026-W21)
+            const now = new Date(Date.now() + serverTimeOffset);
+            const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+            return d.getUTCFullYear() + '-W' + weekNo;
+        }
+
+        // 🌟 전설의 동물 타이머 기능
+        function updatePetRewardTimer() {
+            const timerEl = document.getElementById('petRewardTimer');
+            if(!timerEl) return;
+            
+            const now = new Date(Date.now() + serverTimeOffset);
+            
+            // 다음주 월요일 00:00:00 계산
+            const nextMonday = new Date(now);
+            nextMonday.setHours(0, 0, 0, 0);
+            
+            const day = nextMonday.getDay();
+            const daysToAdd = day === 0 ? 1 : 8 - day; // 일요일(0)이면 +1, 월(1)~토(6)이면 8-day 더함
+            nextMonday.setDate(nextMonday.getDate() + daysToAdd);
+            
+            const diff = nextMonday.getTime() - now.getTime();
+            
+            if (diff <= 0) {
+                timerEl.innerText = "보상 지급 준비 완료 (새로고침 시 지급)";
+                return;
+            }
+            
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const m = Math.floor((diff / 1000 / 60) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+            
+            timerEl.innerText = `${d}일 ${h}시간 ${m}분 ${s}초 남음`;
+        }
+
+        // 1초마다 타이머 업데이트
+        setInterval(() => {
+            if (document.getElementById('detailPage').style.display === 'block' && currentIdx !== null) {
+                updatePetRewardTimer();
+            }
+        }, 1000);
 
         // 🌟 전역 마스터 키 실시간 로드
         db.ref('globalConfig/masterKey').on('value', (snapshot) => {
@@ -524,6 +647,15 @@
                 5: [{img: '', n:'전설의 여전사'}, {img: '', n:'어둠의 대마법사'}, {img: '', n:'하늘의 궁수'}],
                 6: [{img: '', n:'천검의 여제'}, {img: '', n:'볓빛의 수호자'}, {img: '', n:'천상의 궁신'}]
             }
+        };
+
+        // 🐾 전설의 동물 데이터 (이름 및 단계 설정)
+        const petNames = {
+            '유니콘': { 1: '흰색 알', 2: '흰색 말', 3: '유니콘', 4: '전설의 유니콘' },
+            '피닉스': { 1: '붉은색 알', 2: '붉은색 새', 3: '피닉스', 4: '전설의 피닉스' },
+            '청룡': { 1: '푸른색 알', 2: '푸른색 도마뱀', 3: '청룡', 4: '전설의 청룡' },
+            '현무': { 1: '초록색 알', 2: '초록색 거북이', 3: '현무', 4: '전설의 현무' },
+            '구미호': { 1: '주황색 알', 2: '주황색 여우', 3: '구미호', 4: '전설의 구미호' }
         };
 
         const defaultTitles = [ 
@@ -574,7 +706,6 @@
         function updateQuizDB() { if (!db || !currentClassCode) return; db.ref(`classes/${currentClassCode}`).update({ quizData: quizData }); }
         function saveNotice() { if (!db || !isAdmin || !currentClassCode) return; const noticeVal = document.getElementById('noticeContent').innerText; db.ref(`classes/${currentClassCode}`).update({ noticeText: noticeVal }); alert("✅ 저장되었습니다."); }
 
-        // --- 🚀 순위표 토글 추가 로직 ---
         function toggleRanking() {
             if (!isAdmin || !currentClassCode) return;
             const newState = !showRanking;
@@ -636,16 +767,13 @@
                     for (let code in data) {
                         const cls = data[code];
                         if (role === 'teacher') {
-                            // 🌟 띄어쓰기로 인한 오류 방지 처리 추가
                             if (cls.className.replace(/\s+/g, '') === val1.replace(/\s+/g, '') && cls.adminPw === val2) {
                                 foundCode = code;
                                 break;
                             }
                         } else {
-                            // 학생 검색 모드: 해당 학급의 학생 목록을 순회
                             if (cls.students) {
                                 const studentList = Object.values(cls.students);
-                                // 🌟 학생 이름 검색 시에도 띄어쓰기 무시 처리 추가
                                 const foundStudent = studentList.find(s => s && s.name.replace(/\s+/g, '') === val1.replace(/\s+/g, '') && s.pw === val2);
                                 if (foundStudent) {
                                     foundCode = code;
@@ -672,7 +800,6 @@
         function devLogin() {
             const pw = prompt("개발자 암호를 입력하세요.");
             if (!pw) return;
-            // Base64 인코딩으로 비교
             if (btoa(pw) === DEV_TOKEN) {
                 document.getElementById('landingPage').style.display = 'none';
                 document.getElementById('devPage').style.display = 'block';
@@ -731,7 +858,7 @@
             if (confirm(`⚠️ 정말 [${name}] 학급(코드:${code})을 데이터베이스에서 영구 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
                 db.ref(`classes/${code}`).remove().then(() => {
                     alert("학급이 정상적으로 삭제되었습니다.");
-                    loadDevClasses(); // 목록 갱신
+                    loadDevClasses();
                 });
             }
         }
@@ -740,12 +867,54 @@
         db.ref('customEvoImages').on('value', (snapshot) => {
             customEvoImages = snapshot.val() || {};
             applyCustomEvoImages();
-            // 화면 갱신이 필요하다면 (이미 학급에 들어와 있는 상태라면)
             if (currentClassCode && document.getElementById('mainPage').style.display === 'block') {
                 renderGrid();
                 if(currentIdx !== null) updateUI();
             }
         });
+
+        // 🌟 전설의 동물 일러스트 실시간 로드
+        db.ref('customPetImages').on('value', (snapshot) => {
+            customPetImages = snapshot.val() || {};
+            if (currentClassCode) {
+                renderGrid();
+                if(currentIdx !== null) updateUI();
+            }
+        });
+
+        function saveEvoImage() {
+            let g = document.getElementById('evoGenInput').value;
+            let t = document.getElementById('evoTierInput').value;
+            let c = document.getElementById('evoClassInput').value;
+            let url = document.getElementById('evoUrlInput').value.trim();
+            if(!url) return alert("이미지 URL을 붙여넣으세요!");
+            
+            customEvoImages[`${g}_${t}_${c}`] = url;
+            
+            db.ref(`customEvoImages`).set(customEvoImages).then(() => {
+                alert("✅ 캐릭터 이미지가 성공적으로 전역 데이터베이스에 적용되었습니다.");
+                document.getElementById('evoUrlInput').value = ""; 
+            });
+        }
+
+        function savePetImage() {
+            let type = document.getElementById('petTypeInput').value;
+            let stage = document.getElementById('petStageInput').value;
+            let url = document.getElementById('petUrlInput').value.trim();
+            if(!url) return alert("이미지 URL을 붙여넣으세요!");
+            
+            customPetImages[`pet_${type}_${stage}`] = url;
+            db.ref(`customPetImages`).set(customPetImages).then(() => {
+                alert("✅ 전설의 동물 이미지가 성공적으로 적용되었습니다.");
+                document.getElementById('petUrlInput').value = "";
+            });
+        }
+
+        function getPetImageUrl(type, stage) {
+            let key = `pet_${type}_${stage}`;
+            let fallbackName = petNames[type] ? petNames[type][stage] : type;
+            return customPetImages[key] || "https://via.placeholder.com/150/f1c40f/ffffff?text=" + encodeURIComponent(fallbackName);
+        }
 
         // --- 🚀 다중 학급 생성 및 참가 로직 ---
 
@@ -759,7 +928,6 @@
             const adminPw = document.getElementById('createAdminPw').value.trim();
             const adminPwConfirm = document.getElementById('createAdminPwConfirm').value.trim();
             
-            // 1. 학급 생성 키 확인
             if (!masterPw) return alert("학급 생성용 마스터 키를 입력해주세요.");
             if (masterPw !== dynamicMasterKey) {
                 return alert("학급 생성용 마스터 키가 일치하지 않습니다. 선생님께 문의하세요.");
@@ -775,6 +943,7 @@
                 students: [], 
                 noticeText: "반갑습니다! 공지사항을 입력하세요.",
                 showRanking: true, 
+                snackPrice: 300,
                 titleData: defaultTitles,
                 potionData: defaultPotions,
                 quizData: []
@@ -783,7 +952,6 @@
             db.ref(`classes/${newCode}`).set(initialData).then(() => {
                 alert(`🎉 [${className}] 학급이 생성되었습니다!\n\n학생들에게 공유할 참여 코드는 [ ${newCode} ] 입니다.`);
                 
-                // 생성 폼 초기화
                 document.getElementById('createMasterPw').value = "";
                 document.getElementById('createClassName').value = "";
                 document.getElementById('createAdminPw').value = "";
@@ -805,7 +973,7 @@
                     currentClassCode = code;
                     document.getElementById('displayJoinCode').innerText = code;
                     document.getElementById('landingPage').style.display = 'none';
-                    document.getElementById('devPage').style.display = 'none'; // 개발자 모드에서 입장할 경우를 위해 추가
+                    document.getElementById('devPage').style.display = 'none';
                     document.getElementById('mainPage').style.display = 'block';
                     initRealtimeSync(); 
                 } else {
@@ -827,11 +995,14 @@
                     quizData = data.quizData || [];
                     titleData = data.titleData || defaultTitles;
                     potionData = data.potionData || defaultPotions;
+                    snackPrice = data.snackPrice || 300;
                     
-                    showRanking = data.showRanking !== false; // 기본값 true 설정
+                    showRanking = data.showRanking !== false;
                     document.getElementById('rankingSidePanel').style.display = showRanking ? 'block' : 'none';
                     const toggleBtn = document.getElementById('adminToggleRankingBtn');
                     if(toggleBtn) toggleBtn.innerText = showRanking ? "🏆 순위 숨기기" : "🏆 순위 보이기";
+                    
+                    if(document.getElementById('adminSnackPrice')) document.getElementById('adminSnackPrice').value = snackPrice;
 
                     applyCustomEvoImages(); 
 
@@ -866,21 +1037,6 @@
                     }
                 }
             }
-        }
-
-        function saveEvoImage() {
-            let g = document.getElementById('evoGenInput').value;
-            let t = document.getElementById('evoTierInput').value;
-            let c = document.getElementById('evoClassInput').value;
-            let url = document.getElementById('evoUrlInput').value.trim();
-            if(!url) return alert("이미지 URL을 붙여넣으세요!");
-            
-            customEvoImages[`${g}_${t}_${c}`] = url;
-            
-            db.ref(`customEvoImages`).set(customEvoImages).then(() => {
-                alert("✅ 캐릭터 이미지가 성공적으로 전역 데이터베이스에 적용되었습니다.");
-                document.getElementById('evoUrlInput').value = ""; 
-            });
         }
 
         function resetToDefault() {
@@ -918,9 +1074,10 @@
             const newStudent = {
                 id: Date.now(), num: newNum, name: name,
                 money: 10000, donation: 0, stats: { "체력": 5, "지력": 5, "창의성": 5, "정신력": 5, "인성": 5 },
-                myTitles: [], solvedQuizzes: [],
+                myTitles: [], solvedQuizzes: [], pets: [],
                 pw: null, gender: null, characterStage: 0, characterImg: null, characterName: null,
-                enhanceLevel: 0
+                enhanceLevel: 0,
+                lastPetRewardWeek: "" // 🌟 펫 보상 확인용 상태
             };
             students.push(newStudent);
             db.ref(`classes/${currentClassCode}/students`).set(students).then(() => {
@@ -1044,6 +1201,20 @@
                 if (s.enhanceLevel && s.enhanceLevel > 0) {
                     enhanceStarsHtml = `<div class="card-enhance-stars">${'⭐'.repeat(s.enhanceLevel)}</div>`;
                 } else { enhanceStarsHtml = `<div class="card-enhance-stars"></div>`; }
+                
+                // 🐾 전설의 동물 미니 아이콘 생성 (캐릭터 하단 정렬, 친밀도 원형 게이지 적용)
+                let petMiniHtml = '';
+                if(s.pets && s.pets.length > 0) {
+                    petMiniHtml = `<div class="pet-mini-container">`;
+                    s.pets.forEach(p => {
+                        petMiniHtml += `
+                        <div class="pet-mini-wrapper" style="background: conic-gradient(var(--admin-red) ${p.affinity}%, #e0e0e0 0);" title="${p.type} (${p.stage}단계) - 친밀도 ${p.affinity}%">
+                            <img class="pet-mini-icon" src="${getPetImageUrl(p.type, p.stage)}">
+                        </div>`;
+                    });
+                    petMiniHtml += `</div>`;
+                }
+
                 const card = document.createElement('div'); 
                 card.className = `student-card ${top3Ids.includes(s.id) ? 'gold-card' : ''}`; 
                 
@@ -1054,6 +1225,7 @@
                     <div style="font-size:12px; color:#888;">${s.num}번</div> 
                                         ${enhanceStarsHtml} 
                     <div class="char-img-container">${charDisplay}</div>
+                    ${petMiniHtml}
                     <div style="font-weight:bold; font-size:1.1rem; margin-bottom:0px;">${s.name}</div> 
                     <div class="card-titles" style="min-height: 25px; margin: 5px 0;">${(s.myTitles || []).map(t => `<span title="${t.name}">${t.icon}</span>`).join('')}</div>
                     <div class="card-money" style="font-size:0.9rem; color:#d35400; font-weight:bold;">💰 ${s.money.toLocaleString()}원</div>
@@ -1086,6 +1258,7 @@
         }
 
         function updateRanking() { 
+            // 1. Stats Ranking (existing)
             const sortedByStat = [...students].sort((a, b) => { 
                 const sumA = Object.values(a.stats).reduce((p, c) => p + c, 0); 
                 const sumB = Object.values(b.stats).reduce((p, c) => p + c, 0); 
@@ -1100,6 +1273,8 @@
                 </div>`; 
             }); 
             document.getElementById('statRankList').innerHTML = statHtml; 
+            
+            // 2. Donation Ranking (existing)
             const donSorted = [...students].sort((a, b) => b.donation - a.donation).slice(0, 10); 
             let donHtml = ''; 
             donSorted.forEach((s, i) => { 
@@ -1107,6 +1282,24 @@
                 donHtml += `<div class="rank-item"><span class="rank-num">${i+1}</span><span class="rank-name">${s.name}</span><span class="rank-score don">${s.donation.toLocaleString()}</span></div>`; 
             }); 
             document.getElementById('donationRankList').innerHTML = donHtml; 
+            
+            // 3. Pet Affinity Ranking (NEW)
+            const petSorted = [...students].sort((a, b) => {
+                const petSumA = (a.pets || []).reduce((p, c) => p + c.affinity, 0);
+                const petSumB = (b.pets || []).reduce((p, c) => p + c.affinity, 0);
+                return petSumB - petSumA;
+            }).filter(s => (s.pets || []).reduce((p, c) => p + c.affinity, 0) > 0).slice(0, 10);
+            
+            let petHtml = '';
+            if (petSorted.length === 0) {
+                petHtml = '<div style="text-align:center; color:#888; font-size:0.8rem; padding: 10px;">아직 데이터가 없습니다.</div>';
+            } else {
+                petSorted.forEach((s, i) => {
+                    const petSum = (s.pets || []).reduce((p, c) => p + c.affinity, 0);
+                    petHtml += `<div class="rank-item"><span class="rank-num">${i+1}</span><span class="rank-name">${s.name}</span><span class="rank-score pet">${petSum}♥</span></div>`;
+                });
+            }
+            document.getElementById('petRankList').innerHTML = petHtml;
         } 
 
         function checkAutoTitles(idx) {
@@ -1143,10 +1336,36 @@
             if (updated) {
                 Object.keys(s.stats).forEach(k => s.stats[k] = Math.min(100, s.stats[k]));
                 updateStudentDB(idx); 
-                
                 if (currentIdx === idx && typeof updateUI === 'function') updateUI();
-                
                 setTimeout(() => checkAutoTitles(idx), 100);
+            }
+        }
+
+        // 🌟 서버 시간을 이용한 주간 자동 보상 지급
+        function checkAndApplyWeeklyPetRewards(idx) {
+            const s = students[idx];
+            if (!s || !s.pets || s.pets.length === 0) return;
+            
+            const currentWeek = getCurrentWeekId();
+            // 학생의 마지막 보상 주차와 현재 주차가 다를 경우 보상 지급
+            if (s.lastPetRewardWeek !== currentWeek) {
+                let totalReward = 0;
+                s.pets.forEach(p => {
+                    if (p.stage === 2) totalReward += 1000;
+                    else if (p.stage === 3) totalReward += 2000;
+                    else if (p.stage === 4) totalReward += 3000;
+                });
+                
+                s.lastPetRewardWeek = currentWeek; // 주차 업데이트
+
+                if (totalReward > 0) {
+                    s.money += totalReward;
+                    alert(`⏰ 띠링! 주간 접속 보상이 도착했습니다!\n기르고 있는 전설의 동물들이 물어온 주간 보상금 ${totalReward.toLocaleString()}원을 받았습니다!`);
+                    updateStudentDB(idx);
+                } else {
+                    // 보상금이 0원(모두 알 상태)이더라도 주차는 갱신
+                    updateStudentDB(idx);
+                }
             }
         }
 
@@ -1156,13 +1375,17 @@
                 if (!s.pw || !s.gender) { openSetupModal(idx); return; } 
                 if (prompt("비밀번호 입력") !== s.pw) return alert("틀렸습니다."); 
             } else { if (!s.pw || !s.gender) { openSetupModal(idx); return; } }
+            
             checkAutoTitles(idx);
+            checkAndApplyWeeklyPetRewards(idx); // 접속(카드오픈) 시 자동 보상 확인
+
             currentIdx = idx; 
             document.getElementById('mainPage').style.display='none'; 
             document.getElementById('detailPage').style.display='block'; 
             document.getElementById('shopPage').style.display='none'; 
             document.getElementById('quizPage').style.display='none'; 
             updateUI(); 
+            updatePetRewardTimer(); // 즉시 타이머 업데이트
             if(s.gender) checkEvolution(idx);
         } 
 
@@ -1242,7 +1465,134 @@
             document.getElementById('statList').innerHTML = h; 
             document.getElementById('adminStatControls').innerHTML = adminH; 
             document.getElementById('adminPanel').style.display = isAdmin ? 'block' : 'none'; 
+
+            renderPetSection();
         } 
+
+        // 🐾 전설의 동물 렌더링
+        function renderPetSection() {
+            const s = students[currentIdx];
+            if(!s) return;
+            if(!s.pets) s.pets = [];
+            
+            const btn = document.getElementById('petUnlockBtn');
+            btn.style.display = s.pets.length >= 2 ? 'none' : 'inline-block';
+            
+            const list = document.getElementById('petList');
+            if(s.pets.length === 0) {
+                list.innerHTML = `<div style="text-align:center; color:#888; font-size:0.9rem;">아직 부화시킨 동물이 없습니다.<br>알을 부화시켜 매주 능력 보상을 받으세요!</div>`;
+                return;
+            }
+            
+            let html = '';
+            s.pets.forEach((p, index) => {
+                let rewardText = '';
+                if(p.stage === 1) rewardText = '보상 없음 (친밀도를 올려주세요)';
+                else if(p.stage === 2) rewardText = '주간 보상: 1,000원 지급';
+                else if(p.stage === 3) rewardText = '주간 보상: 2,000원 지급';
+                else if(p.stage === 4) rewardText = '주간 보상: 3,000원 지급';
+
+                let nextStageAffinity = 100;
+                if(p.stage === 1) nextStageAffinity = 10;
+                else if(p.stage === 2) nextStageAffinity = 30;
+                else if(p.stage === 3) nextStageAffinity = 70; 
+
+                let progressPct = (p.affinity / nextStageAffinity) * 100;
+                if(progressPct > 100) progressPct = 100;
+
+                let specificName = petNames[p.type] ? petNames[p.type][p.stage] : p.type;
+
+                // 🐾 친밀도 원형 게이지 적용된 이미지 래퍼
+                html += `
+                <div class="pet-card-detail">
+                    <div class="pet-card-img-wrapper" style="background: conic-gradient(var(--admin-red) ${p.affinity}%, #e0e0e0 0);">
+                        <img src="${getPetImageUrl(p.type, p.stage)}" class="pet-card-img">
+                    </div>
+                    <div class="pet-card-info">
+                        <div style="font-weight:bold; font-size:1.1rem; color:#333;">${specificName} <span style="font-size:0.8rem; color:#27ae60; background:#e8f8f5; padding:2px 6px; border-radius:10px;">${p.stage}단계</span></div>
+                        <div style="font-size:0.85rem; color:#888; margin-top:2px;">${rewardText}</div>
+                        <div class="pet-affinity-bar" title="친밀도: ${p.affinity}/${nextStageAffinity}">
+                            <div class="pet-affinity-fill" style="width:${progressPct}%"></div>
+                        </div>
+                        <div style="font-size:0.75rem; color:#e74c3c; text-align:right; margin-top:2px;">친밀도: ${p.affinity} ${p.stage<4 ? `/ ${nextStageAffinity}` : '(MAX)'}</div>
+                    </div>
+                    <button class="btn" style="background:#f39c12; color:white; padding:6px 12px; font-size:0.9rem;" onclick="feedPet(${index})">🍖 간식주기<br><small>(${snackPrice}원)</small></button>
+                </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+
+        // 🌟 전설의 동물 알 모달 창 띄우기
+        function unlockPet() {
+            const s = students[currentIdx];
+            if(!s.pets) s.pets = [];
+            if(s.pets.length >= 2) return alert("전설의 동물은 최대 2마리까지만 기를 수 있습니다.");
+            
+            const cost = s.pets.length === 0 ? 5000 : 10000;
+            if(s.money < cost) return alert(`비용이 부족합니다. ( 비용: ${cost.toLocaleString()}원)`);
+            
+            document.getElementById('petModalCost').innerText = cost.toLocaleString();
+            
+            let html = '';
+            Object.keys(petNames).forEach(type => {
+                const imgUrl = getPetImageUrl(type, 1);
+                const eggName = petNames[type][1];
+                html += `
+                <div class="evo-card" onclick="selectPetFromModal('${type}', ${cost})">
+                    <div class="evo-img-box"><img src="${imgUrl}" style="width:100%; height:100%; object-fit:cover;"></div>
+                    <div class="evo-name">${eggName}</div>
+                </div>`;
+            });
+            
+            document.getElementById('petModalGrid').innerHTML = html;
+            document.getElementById('petModal').style.display = 'flex';
+        }
+
+        // 🌟 모달 창에서 알을 클릭했을 때 처리
+        function selectPetFromModal(typeStr, cost) {
+            const s = students[currentIdx];
+            if(s.pets.some(p => p.type === typeStr)) return alert("이미 기르고 있는 종류입니다. 다른 알을 선택하세요.");
+            
+            if(confirm(`[${petNames[typeStr][1]}](을)를 ${cost.toLocaleString()}원을 지불하고 데려오겠습니까?`)) {
+                s.money -= cost;
+                s.pets.push({ type: typeStr, affinity: 0, stage: 1 });
+                updateStudentDB(currentIdx);
+                document.getElementById('petModal').style.display = 'none';
+                alert(`🎉 훌륭합니다! [${petNames[typeStr][1]}](이)가 성공적으로 데려왔습니다!`);
+                updateUI();
+            }
+        }
+
+        // 🌟 진화 단계 계산 로직 업데이트
+        function getPetStage(affinity) {
+            if(affinity <= 10) return 1;
+            if(affinity <= 30) return 2;
+            if(affinity <= 70) return 3; 
+            return 4;
+        }
+
+        function feedPet(pIdx) {
+            const s = students[currentIdx];
+            const p = s.pets[pIdx];
+            if(p.affinity >= 100) return alert("친밀도가 이미 최대치(100)입니다!");
+            if(s.money < snackPrice) return alert(`돈이 부족합니다. (간식 가격: ${snackPrice}원)`);
+            
+            s.money -= snackPrice;
+            p.affinity += 1; 
+            
+            const newStage = getPetStage(p.affinity);
+            if(newStage > p.stage) {
+                p.stage = newStage;
+                let specificName = petNames[p.type] ? petNames[p.type][p.stage] : p.type;
+                alert(`🎉 축하합니다! 동물이 ${newStage}단계인 [${specificName}](으)로 진화했습니다!`);
+            }
+            updateStudentDB(currentIdx);
+            updateUI();
+            
+            // 메인 페이지(학생 그리드 목록)에도 친밀도 링을 실시간 반영
+            renderGrid();
+        }
 
         function attemptEnhance() {
             const s = students[currentIdx];
@@ -1395,11 +1745,25 @@
             renderShopItems(); checkAutoTitles(currentIdx); checkEvolution(currentIdx); if (typeof updateUI === 'function') updateUI();
         }
 
+        // 🌟 관리자 상점 패널 (동물 간식 가격 관리 포함)
         function renderAdminShop() {
             const grid = document.getElementById('adminShopGrid');
             if (!grid) return;
             grid.style.width = '100%'; grid.style.overflowX = 'auto'; grid.style.paddingBottom = '10px'; grid.innerHTML = ''; 
             const wrapper = document.createElement('div'); wrapper.style.display = 'flex'; wrapper.style.flexDirection = 'column'; wrapper.style.gap = '25px'; wrapper.style.minWidth = '850px'; wrapper.style.width = '100%'; wrapper.style.boxSizing = 'border-box';
+            
+            // 🐾 간식 가격 설정 UI 삽입
+            const snackConfigHtml = `
+                <div style="background:#f4fcf6; border:2px solid #2ecc71; padding:15px; border-radius:12px; margin-bottom:10px;">
+                    <h3 style="color:#27ae60; margin:0 0 10px 0;">🐾 전설의 동물 간식 가격 관리</h3>
+                    <div style="font-size:0.95rem; color:#555; display:flex; align-items:center;">
+                        1개당 가격: <input type="number" id="adminSnackPrice" value="${snackPrice}" style="width:80px; padding:6px; margin:0 5px; border-radius:5px; border:1px solid #ccc; outline:none;"> 원 
+                        <button class="btn" style="background:#2ecc71; color:white; padding:6px 12px; margin-left:10px; font-size:12px;" onclick="changeSnackPrice()">가격 적용하기</button>
+                    </div>
+                </div>
+            `;
+            wrapper.insertAdjacentHTML('beforeend', snackConfigHtml);
+
             const createCard = (item) => {
                 const card = document.createElement('div'); card.className = `admin-item-card ${(!item.onSale && !item.isAuto) ? 'off-item' : ''}`;
                 card.style.display = 'flex'; card.style.flexDirection = 'column'; card.style.border = '1px solid #ffcfcf'; card.style.padding = '10px 8px'; card.style.borderRadius = '12px'; card.style.background = '#fff'; card.style.gap = '8px'; card.style.boxSizing = 'border-box'; card.style.width = '100%'; card.style.boxShadow = '0 2px 5px rgba(0,0,0,0.02)';
@@ -1415,6 +1779,20 @@
                 data.forEach(item => g.appendChild(createCard(item))); sec.appendChild(g); return sec;
             };
             wrapper.appendChild(createSection('🎖️ 칭호 실시간 관리', titleData, 'var(--main-blue)')); wrapper.appendChild(createSection('🧪 포션 실시간 관리', potionData, 'var(--purple)')); grid.appendChild(wrapper);
+        }
+
+        // 🌟 간식 가격 수정 함수
+        function changeSnackPrice() {
+            if(!isAdmin || !currentClassCode) return;
+            const inputEl = document.getElementById('adminSnackPrice');
+            if(!inputEl) return;
+            const newVal = parseInt(inputEl.value);
+            if(isNaN(newVal) || newVal < 0) return alert("올바른 가격을 입력하세요.");
+            
+            db.ref(`classes/${currentClassCode}`).update({ snackPrice: newVal }).then(() => {
+                alert(`전설의 동물 간식 가격이 ${newVal}원으로 성공적으로 적용되었습니다.`);
+                if(currentIdx !== null) updateUI();
+            });
         }
 
         function generateMultipleChoiceInputs() {
@@ -1507,7 +1885,7 @@
         function resetIndividualData() {
             if (!isAdmin || !currentClassCode) return; const s = students[currentIdx];
             if (confirm(`[${s.name}] 학생 데이터를 초기화할까요?`)) {
-                s.money = 10000; s.donation = 0; s.stats = { "체력": 5, "지력": 5, "창의성": 5, "정신력": 5, "인성": 5 }; s.myTitles = []; s.solvedQuizzes = []; s.pw = null; s.gender = null; s.characterStage = 0; s.characterImg = null; s.characterName = null; s.enhanceLevel = 0; 
+                s.money = 10000; s.donation = 0; s.stats = { "체력": 5, "지력": 5, "창의성": 5, "정신력": 5, "인성": 5 }; s.myTitles = []; s.solvedQuizzes = []; s.pets = []; s.pw = null; s.gender = null; s.characterStage = 0; s.characterImg = null; s.characterName = null; s.enhanceLevel = 0; s.lastPetRewardWeek = "";
                 updateStudentDB(currentIdx); alert("해당 학생 데이터가 초기화되었습니다."); updateUI();
             }
         }
